@@ -4,8 +4,10 @@ const dotenv = require('dotenv')
 const colors = require('colors')
 const connectDb = require('./config/connectDb')
 
-//database call
+//configure dotenv file
 dotenv.config()
+
+//database call
 connectDb()
 
 //rest object
