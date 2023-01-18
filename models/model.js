@@ -1,14 +1,31 @@
 const mongoose =  require('mongoose')
-const Joi = require('joi')
-//schema design
-const userSchema = Joi.object({
-    title: Joi.string().min(3).max(100).required().timestamp().messages("you must enter the letter between 3-100"),
-        
-    
-    description:Joi.string().min(1).max(1000).required().timestamp().messages("you must enter the letter between 1-1000"),
-    is_released:Joi.boolean().required().timestamp().messages("you must enter the boolean value")   
-     
-});
 
-const userModel = mongoose.model('movies',userSchema)
-module.exports =  userModel
+
+//schema design
+const userSchema = new  mongoose.Schema({
+    title:{
+        type:String,
+        unique:true
+    },
+    description:{
+        type:String
+    },
+    is_released:{
+    } 
+},{timestamps : true})
+
+module.exports = mongoose.model('movies',userSchema)
+
+
+
+
+// userSchema.methods.joiValidate = function(obj){
+//     var Joi = require('joi')
+//     var schema = {
+//         name: Joi.types.String().min(3).max(100).required(),
+//         description : Joi.types.String().min(1).max(1000).required(),
+//         is_released: Joi.types.String().required()
+//     }
+//     return Joi.ValidationError(obj,schema)
+// }
+
