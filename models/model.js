@@ -1,19 +1,18 @@
-const mongoose =  require('mongoose')
-
+const mongoose = require("mongoose");
 
 //schema design
-const userSchema = new  mongoose.Schema({
-    title:{
-        type:String,
-        unique:true
+const userSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      unique: true,
     },
-    description:{
-        type:String
+    description: {
+      type: String,
     },
-    is_released:{
-    } 
-},{timestamps : true})
+    is_released: {},
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('movies',userSchema)
-
-
+module.exports = mongoose.model("movies", userSchema);
