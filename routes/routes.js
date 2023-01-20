@@ -1,15 +1,15 @@
 const express = require('express')
 const router = express.Router();
-const { getmovies,findmovies,addmovies,updatemovies,deletemovies } = require("../controller/controller")
+const { getMovies,findMovies,addMovies,updateMovies,deleteMovies } = require("../controller/movieController")
 
-router.get('/',getmovies)
+router.get('/',getMovies)
 
-router.get('/:id',findmovies)
+router.get('/:id',findMovies)
 
-router.post('/',addmovies)
+router.post('/',addMovies)
 
-router.put('/:id',updatemovies)
+router.put('/:id',updateMovies)
 
-router.delete('/:id',deletemovies)
+router.delete('/:id',deleteMovies)
 
 module.exports = router
