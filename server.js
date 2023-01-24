@@ -16,6 +16,7 @@ app.use(express.json());
 
 //routes
 const route = require("./routes/routes");
+
 app.use("/movies", route);
 
 //port

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 //schema design
-const userSchema = new mongoose.Schema(
+const MovieSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -15,4 +15,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("movies", userSchema);
+module.exports = mongoose.model("movies", MovieSchema);

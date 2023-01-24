@@ -1,12 +1,12 @@
-const success = (successMessage,res) => {
-    res.status(200).json({ successMessage })
-}
+const successResponse = (successMessage, res) => {
+  res.json({ successMessage }).status(200);
+};
 
-const error = (errorMessage,res) => {
-    res.status(500).json({ errorMessage })
-}
+const errorResponse = (errorMessage, res, statusCode) => {
+  res.status(statusCode).json({ errorMessage });
+};
 
 module.exports = {
-    success,
-    error
-}
+  successResponse,
+  errorResponse,
+};

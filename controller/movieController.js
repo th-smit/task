@@ -1,5 +1,5 @@
-const Model = require("../models/Movie");
-const { success, error } = require("../utils/Response");
+const Movie = require("../models/movieModel");
+const { successResponse, errorResponse } = require("../utils/Response");
 const {
   addMovieValidation,
   updateMovieValidation,
@@ -7,24 +7,27 @@ const {
 
 const getMovies = async (req, res) => {
   let sign = "-";
-  if (Number(req.query.sort) == 1) {
+  let sortBy = "updatedAt";
+
+  const sortMethod = {
+    updated: "updatedAt",
+    created: "createdAt",
+  };
+
+  if (Number(req.query.sort) === 1) {
     sign = "";
   }
 
+  if (req.query.sortedby in sortMethod) {
+    sortBy = req.query.sortedby;
+  }
+
   try {
-    if (!req.query.sortedby) {
-      req.query.sortedby = "updatedAt";
-    } else {
-      if (req.query.sortedby != "createdAt") {
-        error("need to pass proper query string", res);
-      }
-    }
+    const sortedData = await Movie.find().sort(sign + sortBy);
 
-    const sortedData = await Model.find().sort("" + sign + req.query.sortedby);
-
-    success(sortedData, res);
+    successResponse(sortedData, res);
   } catch (err) {
-    error(err, res);
+    errorResponse(err, res, 404);
   }
 };
 
@@ -33,36 +36,35 @@ const addMovies = async (req, res) => {
     const value = await addMovieValidation.validateAsync(req.body);
 
     if (value) {
-      const { title, description, is_released } = req.body;
-      const data = new Model({
-        title: title,
-        description: description,
-        is_released: is_released,
+      const dataObj = new Movie({
+        title: req.body.title,
+        description: req.body.description,
+        is_released: req.body.is_released,
       });
 
-      const moviesData = await data.save();
-      success(moviesData, res);
+      const moviesData = await dataObj.save();
+      successResponse(moviesData, res);
     }
   } catch (err) {
-    error(err.details[0]?.message, res);
+    errorResponse(err.details[0]?.message, res, 501);
   }
 };
 
 const findMovies = async (req, res) => {
   try {
-    const moviesData = await Model.findById(req.params.id);
-    success(moviesData, res);
+    const moviesData = await Movie.findById(req.params.id);
+    successResponse(moviesData, res);
   } catch (err) {
-    error("id does not exist", res);
+    errorResponse(err, res, 404);
   }
 };
 
 const updateMovies = async (req, res) => {
   try {
-    const moviesData = await Model.findById(req.params.id);
+    const moviesData = await Movie.findById(req.params.id);
 
     if (!moviesData) {
-      return error("id does not exist", res);
+      errorResponse("id does not exist", res);
     } else {
       const updatedMoviesData = moviesData;
 
@@ -79,28 +81,28 @@ const updateMovies = async (req, res) => {
       const value = await updateMovieValidation.validateAsync(req.body);
 
       if (value) {
-        await Model.findByIdAndUpdate(req.params.id, {
+        await Movie.findByIdAndUpdate(req.params.id, {
           $set: updatedMoviesData,
         });
-        success(updatedMoviesData, res);
+        successResponse(updatedMoviesData, res);
       }
     }
   } catch (err) {
-    error(err.details[0]?.message, res);
+    errorResponse(err, res, 500);
   }
 };
 
 const deleteMovies = async (req, res) => {
   try {
-    let moviesData = await Model.findById(req.params.id);
+    const moviesData = await Movie.findById(req.params.id);
 
     if (!moviesData) {
-      return error("id does not exist", res);
+      errorResponse("id does not exist", res, 404);
     }
-    const resultedData = await Model.deleteOne({ _id: req.params.id });
-    success(resultedData, res);
+    const resultedData = await Movie.deleteOne({ _id: req.params.id });
+    successResponse(resultedData, res);
   } catch (err) {
-    error(err, res);
+    errorResponse(err, res, 500);
   }
 };
 
