@@ -1,9 +1,9 @@
 const successResponse = (successMessage, res) => {
-  res.json({ successMessage }).status(200);
+  res.status(200).json({ successMessage });
 };
 
-const errorResponse = (errorMessage, res, statusCode) => {
-  res.status(statusCode).json({ errorMessage });
+const errorResponse = (errorMessage, res, code) => {
+  res.status(code).json({ errorMessage });
 };
 
 module.exports = {

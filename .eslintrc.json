@@ -12,18 +12,24 @@
     },
     "rules": {
         "quotes":["error","double"],
-        "no-unused-vars":"error",
+        "no-unused-vars":"warn",
         "no-console":"off",
         "eqeqeq":"warn",
         "no-lonely-if":"off",
         "prefer-template":"warn",
         "camelcase":"warn",
-        "object-shorthand":"error",
+        "object-shorthand":"warn",
         "prefer-const":"warn",
         "consistent-return":"warn",
         "no-else-return":"error",
         "spaced-comment":"off",
-        "newline-after-import":"off"
+        "newline-after-import":"off",
+        "import/no-extraneous-dependencies":"off",
+        "import/newline-after-import":"off",
+        "no-underscore-dangle":"off",
+        "no-lone-blocks":"off"
+        
+        
 
 
     }

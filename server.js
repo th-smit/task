@@ -14,10 +14,9 @@ const app = express();
 //middleware
 app.use(express.json());
 
-//routes
-const route = require("./routes/routes");
-
-app.use("/movies", route);
+//routesconst route = require("./routes/routes");
+app.use("/movies", require("./routes/movieRoutes"));
+app.use("/users", require("./routes/userRoutes"));
 
 //port
 const PORT = 8080;

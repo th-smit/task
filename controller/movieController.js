@@ -24,7 +24,6 @@ const getMovies = async (req, res) => {
 
   try {
     const sortedData = await Movie.find().sort(sign + sortBy);
-
     successResponse(sortedData, res);
   } catch (err) {
     errorResponse(err, res, 404);
@@ -52,10 +51,10 @@ const addMovies = async (req, res) => {
 
 const findMovies = async (req, res) => {
   try {
-    const moviesData = await Movie.findById(req.params.id);
+    const moviesData = await Movie.findById({ _id: req.params.id });
     successResponse(moviesData, res);
   } catch (err) {
-    errorResponse(err, res, 404);
+    errorResponse("does not exist", res, 404);
   }
 };
 
@@ -64,7 +63,7 @@ const updateMovies = async (req, res) => {
     const moviesData = await Movie.findById(req.params.id);
 
     if (!moviesData) {
-      errorResponse("id does not exist", res);
+      errorResponse("id does not exist", res, 404);
     } else {
       const updatedMoviesData = moviesData;
 
@@ -94,15 +93,11 @@ const updateMovies = async (req, res) => {
 
 const deleteMovies = async (req, res) => {
   try {
-    const moviesData = await Movie.findById(req.params.id);
-
-    if (!moviesData) {
-      errorResponse("id does not exist", res, 404);
-    }
+    await Movie.findById(req.params.id);
     const resultedData = await Movie.deleteOne({ _id: req.params.id });
     successResponse(resultedData, res);
   } catch (err) {
-    errorResponse(err, res, 500);
+    errorResponse("id does not exist", res, 500);
   }
 };
 
