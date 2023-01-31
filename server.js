@@ -1,32 +1,27 @@
-const express = require('express')
-const morgan = require('morgan')
-const dotenv = require('dotenv')
-const colors = require('colors')
-const connectDb = require('./config/connectDb')
-
+const express = require("express");
+const dotenv = require("dotenv");
+const connectDb = require("./config/connectDb");
 
 //configure dotenv file
-dotenv.config()
+dotenv.config();
 
 //database call
-connectDb()
+connectDb();
 
 //rest object
-const app = express()
+const app = express();
 
 //middleware
-app.use(express.json())
+app.use(express.json());
 
-//routes
-const rt = require('./routes/routes')
-app.use('/',rt)
+//routesconst route = require("./routes/routes");
+app.use("/movies", require("./routes/movieRoutes"));
+app.use("/users", require("./routes/userRoutes"));
 
-
-//port 
-const PORT = 8080
+//port
+const PORT = 8080;
 
 //listening server
-app.listen(PORT,()=>{
-    console.log(`server running on ${PORT}`)
-})
-
+app.listen(PORT, () => {
+  console.log(`server running on ${PORT}`);
+});
