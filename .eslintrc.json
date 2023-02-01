@@ -6,12 +6,12 @@
         "node":true
     },
     "extends": ["airbnb-base","prettier"],
-    "plugins": ["prettier"],
+    "plugins": ["prettier","react-hooks"],
     "parserOptions": {
         "ecmaVersion": "latest"
     },
     "rules": {
-        "quotes":["error","double"],
+        // "quotes":["error","double"],
         "no-unused-vars":"warn",
         "no-console":"off",
         "eqeqeq":"warn",
@@ -27,7 +27,15 @@
         "import/no-extraneous-dependencies":"off",
         "import/newline-after-import":"off",
         "no-underscore-dangle":"off",
-        "no-lone-blocks":"off"
+        "no-lone-blocks":"off",
+        "prefer-arrow-callback":"off",
+        "react-hooks":"off",
+        "rules-of-hooks":"off",
+        "react-hooks/rules-of-hooks": "off", 
+        "react-hooks/exhaustive-deps": "warn" ,
+        "no-useless-escape":"off",
+        "no-import-module-exports":"off"
+
         
         
 

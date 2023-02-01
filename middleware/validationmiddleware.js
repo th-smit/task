@@ -15,8 +15,8 @@ const updateMovieValidation = Joi.object().keys({
 });
 
 const registerUserValidation = Joi.object().keys({
-  name: Joi.string().min(3).max(100).required(),
-  email: Joi.string().min(3).email().required(),
+  name: Joi.string().min(3).max(40).required(),
+  email: Joi.string().email().required(),
   password: joipassword
     .string()
     .minOfSpecialCharacters(1)
@@ -27,11 +27,24 @@ const registerUserValidation = Joi.object().keys({
     .min(4)
     .max(10)
     .required(),
-  role: Joi.string().valid("user", "admin").required(),
 });
 
+const forgotPasswordValidation = Joi.object().keys({
+  email: Joi.string().email().required(),
+  password: joipassword
+    .string()
+    .minOfSpecialCharacters(1)
+    .minOfLowercase(1)
+    .minOfUppercase(1)
+    .minOfNumeric(1)
+    .noWhiteSpaces()
+    .min(4)
+    .max(10)
+    .required(),
+});
 module.exports = {
   addMovieValidation,
   updateMovieValidation,
   registerUserValidation,
+  forgotPasswordValidation,
 };

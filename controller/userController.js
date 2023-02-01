@@ -10,14 +10,11 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const signUp = async (req, res) => {
-  const { name, email, password, role } = req.body;
-
+  const { name, email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
-
-    const validateUser = await registerUserValidation.validateAsync(req.body);
-
-    if (existingUser && validateUser) {
+    await registerUserValidation.validateAsync(req.body);
+    if (existingUser) {
       errorResponse("User already exist", res, 400);
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,7 +23,6 @@ const signUp = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role,
       });
 
       await newUserData.save();
@@ -50,11 +46,8 @@ const signIn = async (req, res) => {
       existingUser.password
     );
 
-    if (
-      !existingUser ||
-      !matchPassword ||
-      existingUser.role !== req.body.role
-    ) {
+    if (!existingUser || !matchPassword) {
+      // existingUser.role !== req.body.role
       errorResponse("Invalid Credential", res, 404);
     } else {
       const token = jwt.sign(

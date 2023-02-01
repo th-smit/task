@@ -80,9 +80,13 @@ const updateMovies = async (req, res) => {
       const value = await updateMovieValidation.validateAsync(req.body);
 
       if (value) {
-        await Movie.findByIdAndUpdate(req.params.id, {
-          $set: updatedMoviesData,
-        });
+        await Movie.findByIdAndUpdate(
+          req.params.id,
+          {
+            $set: updatedMoviesData,
+          },
+          { New: true }
+        );
         successResponse(updatedMoviesData, res);
       }
     }
