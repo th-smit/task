@@ -26,7 +26,7 @@ const mailer = async (email, code) => {
     if (error) {
       console.log(error);
     } else {
-      console.log("email sent to the " + email); //
+      console.log("Email Sent To The " + email); //
     }
   });
 };
@@ -46,9 +46,9 @@ const emailSend = async (req, res) => {
 
       await otpData.save();
       mailer(otpData.email, otpData.code.toString());
-      successResponse("please check your mail", res);
+      successResponse("Please Check Your Mail", res);
     } else {
-      errorResponse("id does not exist", res, 404);
+      errorResponse("Email Does Not Exist", res, 404);
     }
   } catch (error) {
     errorResponse(error, res, 500);
@@ -56,23 +56,27 @@ const emailSend = async (req, res) => {
 };
 const otpVerify = async (req, res) => {
   try {
-    const data = await Otp.findOne({
+    const otpData = await Otp.findOne({
       email: req.body.email,
       code: req.body.otp,
     });
-    console.log(data);
-    if (data) {
+    if (otpData) {
       const currentTime = new Date().getTime();
-      const otpLife = data.expireIn - currentTime;
+      const otpLife = otpData.expireIn - currentTime;
       console.log(otpLife);
       if (otpLife < 0) {
-        errorResponse("otp life has been expire", res, 400);
+        errorResponse("Otp Life Has Been Expire", res, 400);
       } else {
-        successResponse("otp verified", res);
+        if (otpData.code === req.body.otp) {
+          otpData.is_verified = true;
+          otpData.save();
+          successResponse("Otp Verified", res);
+        } else {
+          errorResponse("Invalid Otp", res, 401);
+        }
       }
-      await Otp.remove({ email: req.body.email });
     } else {
-      errorResponse("invalid creditials", res, 400);
+      errorResponse("Invalid Creditials", res, 400);
     }
   } catch (error) {
     errorResponse(error, res, 404);
@@ -81,15 +85,18 @@ const otpVerify = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
+    const otpData = await Otp.findOne({ email: req.body.email });
+    if (otpData.is_verified === true) {
       await forgotPasswordValidation.validateAsync(req.body);
+
+      const userData = await User.findOne({ email: req.body.email });
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      user.password = hashedPassword;
-      user.save();
-      successResponse("password changed successfully ", res);
+      userData.password = hashedPassword;
+      userData.save();
+      await Otp.remove({ email: req.body.email });
+      successResponse("Password Changed Successfully ", res);
     } else {
-      errorResponse("email not exist", res, 404);
+      errorResponse("Email Not Verified", res, 404);
     }
   } catch (error) {
     errorResponse(error.message, res, 500);

@@ -1,9 +1,8 @@
 const successResponse = (successMessage, res) => {
-  res.status(200).send({ successMessage });
+  res.status(200).json({ successMessage });
 };
 
 const errorResponse = (errorMessage, res, code) => {
-  console.log(code);
   res.status(code).json({ errorMessage });
 };
 
