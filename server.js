@@ -18,6 +18,7 @@ app.use(cors());
 
 app.use("/pwd", require("./routes/otpRoutes"));
 app.use("/users", require("./routes/userRoutes"));
+app.use("/movie", require("./routes/movieRoutes"));
 
 //port
 const PORT = 8080;

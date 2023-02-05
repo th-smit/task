@@ -70,6 +70,7 @@ const otpVerify = async (req, res) => {
         if (otpData.code === req.body.otp) {
           otpData.is_verified = true;
           otpData.save();
+          console.log(otpData);
           successResponse("Otp Verified", res);
         } else {
           errorResponse("Invalid Otp", res, 401);
@@ -88,7 +89,6 @@ const changePassword = async (req, res) => {
     const otpData = await Otp.findOne({ email: req.body.email });
     if (otpData.is_verified === true) {
       await forgotPasswordValidation.validateAsync(req.body);
-
       const userData = await User.findOne({ email: req.body.email });
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       userData.password = hashedPassword;

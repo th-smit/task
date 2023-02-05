@@ -10,11 +10,14 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const signUp = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
+
   try {
     const existingUser = await User.findOne({ email });
-    await registerUserValidation.validateAsync(req.body);
-    if (existingUser) {
+
+    const validateUser = await registerUserValidation.validateAsync(req.body);
+
+    if (existingUser && validateUser) {
       errorResponse("User already exist", res, 400);
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,14 +26,11 @@ const signUp = async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        role,
       });
 
       await newUserData.save();
-      const token = jwt.sign(
-        { email: newUserData.email, id: newUserData._id },
-        SECRET_KEY
-      );
-      successResponse({ user: newUserData, token }, res);
+      successResponse({ user: newUserData }, res);
     }
   } catch (error) {
     errorResponse(error.message, res, 500);
@@ -54,6 +54,7 @@ const signIn = async (req, res) => {
         { email: existingUser.email, id: existingUser._id },
         SECRET_KEY
       );
+      //console.log(token);
       successResponse({ user: existingUser, token }, res);
     }
   } catch (err) {
