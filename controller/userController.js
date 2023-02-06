@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
-const SECRET_KEY = "SECRET";
 
 const { successResponse, errorResponse } = require("../utils/Response");
 
@@ -14,7 +13,6 @@ const signUp = async (req, res) => {
 
   try {
     const existingUser = await User.findOne({ email });
-
     const validateUser = await registerUserValidation.validateAsync(req.body);
 
     if (existingUser && validateUser) {
@@ -52,9 +50,8 @@ const signIn = async (req, res) => {
     } else {
       const token = jwt.sign(
         { email: existingUser.email, id: existingUser._id },
-        SECRET_KEY
+        process.env.SECRET_KEY
       );
-      //console.log(token);
       successResponse({ user: existingUser, token }, res);
     }
   } catch (err) {

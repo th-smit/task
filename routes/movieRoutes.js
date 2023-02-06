@@ -1,5 +1,5 @@
 const express = require("express");
-
+const { auth } = require("../middleware/auth");
 const router = express.Router();
 
 const {
@@ -10,7 +10,7 @@ const {
   deleteMovies,
 } = require("../controller/movieController");
 
-router.get("/", getMovies);
+router.get("/", auth, getMovies);
 
 router.get("/:id", findMovies);
 

@@ -16,6 +16,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// function verifyToken(req, res, next) {
+//
+// }
 app.use("/pwd", require("./routes/otpRoutes"));
 app.use("/users", require("./routes/userRoutes"));
 app.use("/movie", require("./routes/movieRoutes"));

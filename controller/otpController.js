@@ -34,17 +34,20 @@ const mailer = async (email, code) => {
 const emailSend = async (req, res) => {
   try {
     const userData = await User.findOne({ email: req.body.email });
-
+    console.log(userData);
     if (userData) {
       const otp = Math.floor(Math.random() * 1000000 + 1); //6 digit otp
 
-      const otpData = new Otp({
+      const otpData = {
         email: req.body.email,
         code: otp,
         expireIn: new Date().getTime() + 300 * 1000, //5 min expire time
-      });
-
-      await otpData.save();
+      };
+      const updatedData = await Otp.findOneAndUpdate(
+        { email: req.body.email },
+        { $set: otpData },
+        { new: true, upsert: true }
+      );
       mailer(otpData.email, otpData.code.toString());
       successResponse("Please Check Your Mail", res);
     } else {
@@ -63,14 +66,12 @@ const otpVerify = async (req, res) => {
     if (otpData) {
       const currentTime = new Date().getTime();
       const otpLife = otpData.expireIn - currentTime;
-      console.log(otpLife);
       if (otpLife < 0) {
         errorResponse("Otp Life Has Been Expire", res, 400);
       } else {
         if (otpData.code === req.body.otp) {
           otpData.is_verified = true;
           otpData.save();
-          console.log(otpData);
           successResponse("Otp Verified", res);
         } else {
           errorResponse("Invalid Otp", res, 401);
