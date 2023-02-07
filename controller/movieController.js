@@ -7,24 +7,8 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const getMovies = async (req, res) => {
-  let sign = "-";
-  let sortBy = "updatedAt";
-
-  const sortMethod = {
-    updated: "updatedAt",
-    created: "createdAt",
-  };
-
-  if (Number(req.query.sort) === 1) {
-    sign = "";
-  }
-
-  if (req.query.sortedby in sortMethod) {
-    sortBy = req.query.sortedby;
-  }
-
   try {
-    const sortedData = await Movie.find().sort(sign + sortBy);
+    const sortedData = await Movie.find().sort(req.query.sortedby);
     successResponse(sortedData, res);
   } catch (err) {
     errorResponse(err, res, 404);
@@ -39,6 +23,8 @@ const addMovies = async (req, res) => {
       const dataObj = new Movie({
         title: req.body.title,
         description: req.body.description,
+        poster_api: req.body.poster_api,
+        movie_type: req.body.movie_type,
         is_released: req.body.is_released,
       });
 
@@ -52,7 +38,7 @@ const addMovies = async (req, res) => {
 
 const findMovies = async (req, res) => {
   try {
-    const moviesData = await Movie.findById({ _id: req.params.id });
+    const moviesData = await Movie.findOne({ title: req.params.title });
     successResponse(moviesData, res);
   } catch (err) {
     errorResponse("does not exist", res, 404);

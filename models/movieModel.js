@@ -10,6 +10,12 @@ const MovieSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    poster_api: {
+      type: String,
+    },
+    movie_type: {
+      type: String,
+    },
     is_released: {},
   },
   { timestamps: true }

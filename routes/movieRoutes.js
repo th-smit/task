@@ -12,7 +12,7 @@ const {
 
 router.get("/", auth, getMovies);
 
-router.get("/:id", findMovies);
+router.get("/:title", findMovies);
 
 router.post("/", addMovies);
 
