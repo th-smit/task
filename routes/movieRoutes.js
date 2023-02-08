@@ -4,15 +4,12 @@ const router = express.Router();
 
 const {
   getMovies,
-  findMovies,
   addMovies,
   updateMovies,
   deleteMovies,
 } = require("../controller/movieController");
 
 router.get("/", auth, getMovies);
-
-router.get("/:title", findMovies);
 
 router.post("/", addMovies);
 

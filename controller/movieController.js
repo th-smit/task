@@ -8,7 +8,9 @@ const {
 
 const getMovies = async (req, res) => {
   try {
-    const sortedData = await Movie.find().sort(req.query.sortedby);
+    const sortedData = await Movie.find({
+      title: { $regex: req.query.title, $options: "i" },
+    }).sort(req.query.sortedby);
     successResponse(sortedData, res);
   } catch (err) {
     errorResponse(err, res, 404);
@@ -33,15 +35,6 @@ const addMovies = async (req, res) => {
     }
   } catch (err) {
     errorResponse(err.details[0]?.message, res, 501);
-  }
-};
-
-const findMovies = async (req, res) => {
-  try {
-    const moviesData = await Movie.findOne({ title: req.params.title });
-    successResponse(moviesData, res);
-  } catch (err) {
-    errorResponse("does not exist", res, 404);
   }
 };
 
@@ -94,7 +87,6 @@ const deleteMovies = async (req, res) => {
 
 module.exports = {
   getMovies,
-  findMovies,
   addMovies,
   updateMovies,
   deleteMovies,
