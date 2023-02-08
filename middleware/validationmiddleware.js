@@ -4,8 +4,8 @@ const joipassword = Joi.extend(joiPasswordExtendCore);
 
 const addMovieValidation = Joi.object({
   title: Joi.string().min(3).max(100).required(),
-  description: Joi.string().min(1).max(5000).required(),
-  poster_api: Joi.string().min(10).max(2000).required(),
+  description: Joi.string().min(3).max(5000).required(),
+  poster_api: Joi.string().min(1).max(2000).required(),
   movie_type: Joi.string().min(4).max(50).required(),
   is_released: Joi.boolean().required(),
 });

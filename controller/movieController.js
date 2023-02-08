@@ -18,9 +18,9 @@ const getMovies = async (req, res) => {
 };
 
 const addMovies = async (req, res) => {
+  console.log(req.body);
   try {
     const value = await addMovieValidation.validateAsync(req.body);
-
     if (value) {
       const dataObj = new Movie({
         title: req.body.title,
