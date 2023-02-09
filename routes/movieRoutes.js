@@ -13,8 +13,8 @@ router.get("/", auth, getMovies);
 
 router.post("/", addMovies);
 
-router.put("/:id", updateMovies);
+router.put("/:email", updateMovies);
 
-router.delete("/:id", deleteMovies);
+router.delete("/:title", deleteMovies);
 
 module.exports = router;

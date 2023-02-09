@@ -40,7 +40,7 @@ const addMovies = async (req, res) => {
 
 const updateMovies = async (req, res) => {
   try {
-    const moviesData = await Movie.findById(req.params.id);
+    const moviesData = await Movie.findById(req.params.title);
 
     if (!moviesData) {
       errorResponse("id does not exist", res, 404);
@@ -76,9 +76,10 @@ const updateMovies = async (req, res) => {
 };
 
 const deleteMovies = async (req, res) => {
+  console.log("from deleteMovies  " + req.params.title);
   try {
-    await Movie.findById(req.params.id);
-    const resultedData = await Movie.deleteOne({ _id: req.params.id });
+    // await Movie.findById(req.body.userEmail);
+    const resultedData = await Movie.deleteOne({ title: req.params.title });
     successResponse(resultedData, res);
   } catch (err) {
     errorResponse("id does not exist", res, 500);
