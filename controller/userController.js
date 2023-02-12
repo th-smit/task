@@ -38,7 +38,6 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email });
-
     const matchPassword = await bcrypt.compare(
       req.body.password,
       existingUser.password
@@ -49,7 +48,11 @@ const signIn = async (req, res) => {
       errorResponse("Invalid Credential", res, 404);
     } else {
       const token = jwt.sign(
-        { email: existingUser.email, id: existingUser._id },
+        {
+          email: existingUser.email,
+          id: existingUser._id,
+          role: existingUser.role,
+        },
         process.env.SECRET_KEY
       );
       successResponse({ user: existingUser, token }, res);

@@ -13,7 +13,7 @@ router.get("/", auth, getMovies);
 
 router.post("/", addMovies);
 
-router.put("/:email", updateMovies);
+router.put("/:id", updateMovies);
 
 router.delete("/:title", deleteMovies);
 

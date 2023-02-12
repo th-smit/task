@@ -39,11 +39,13 @@ const addMovies = async (req, res) => {
 };
 
 const updateMovies = async (req, res) => {
+  console.log(req.body);
+  console.log(req.params.id);
   try {
-    const moviesData = await Movie.findById(req.params.title);
-
+    const moviesData = await Movie.findOne({ _id: req.params.id });
+    console.log(moviesData);
     if (!moviesData) {
-      errorResponse("id does not exist", res, 404);
+      errorResponse("title does not exist", res, 404);
     } else {
       const updatedMoviesData = moviesData;
 
@@ -53,6 +55,12 @@ const updateMovies = async (req, res) => {
       if (req.body.description) {
         updatedMoviesData.description = req.body.description;
       }
+      if (req.body.poster_api) {
+        updatedMoviesData.poster_api = req.body.poster_api;
+      }
+      if (req.body.movie_type) {
+        updatedMoviesData.is_released = req.body.movie_type;
+      }
       if (req.body.is_released) {
         updatedMoviesData.is_released = req.body.is_released;
       }
@@ -60,8 +68,8 @@ const updateMovies = async (req, res) => {
       const value = await updateMovieValidation.validateAsync(req.body);
 
       if (value) {
-        await Movie.findByIdAndUpdate(
-          req.params.id,
+        await Movie.findOneAndUpdate(
+          { _id: req.params.id },
           {
             $set: updatedMoviesData,
           },
