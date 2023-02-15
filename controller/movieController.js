@@ -59,7 +59,7 @@ const updateMovies = async (req, res) => {
         updatedMoviesData.poster_api = req.body.poster_api;
       }
       if (req.body.movie_type) {
-        updatedMoviesData.is_released = req.body.movie_type;
+        updatedMoviesData.movie_type = req.body.movie_type;
       }
       if (req.body.is_released) {
         updatedMoviesData.is_released = req.body.is_released;

@@ -11,10 +11,10 @@ const {
 
 router.get("/", auth, getMovies);
 
-router.post("/", addMovies);
+router.post("/", auth, addMovies);
 
-router.put("/:id", updateMovies);
+router.put("/:id", auth, updateMovies);
 
-router.delete("/:title", deleteMovies);
+router.delete("/:title", auth, deleteMovies);
 
 module.exports = router;

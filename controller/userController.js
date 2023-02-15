@@ -9,26 +9,35 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const signUp = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  console.log(req.body);
+
+  const { name, email, password } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
+
     const validateUser = await registerUserValidation.validateAsync(req.body);
 
     if (existingUser && validateUser) {
       errorResponse("User already exist", res, 400);
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
-
+      console.log("hello");
       const newUserData = new User({
         name,
         email,
         password: hashedPassword,
-        role,
       });
 
+      const token = jwt.sign(
+        {
+          email: email,
+        },
+        process.env.SECRET_KEY
+      );
+      console.log("hello");
       await newUserData.save();
-      successResponse({ user: newUserData }, res);
+      successResponse({ user: newUserData, token: token }, res);
     }
   } catch (error) {
     errorResponse(error.message, res, 500);
@@ -50,8 +59,6 @@ const signIn = async (req, res) => {
       const token = jwt.sign(
         {
           email: existingUser.email,
-          id: existingUser._id,
-          role: existingUser.role,
         },
         process.env.SECRET_KEY
       );
@@ -62,7 +69,21 @@ const signIn = async (req, res) => {
   }
 };
 
+const userDetails = async (req, res) => {
+  const { email, name } = req.body;
+  // console.log(email);
+  // console.log(name);
+  // const userDetailsmail = await User.findOne({ email: req.body.email });
+  try {
+    await User.findOneAndUpdate({ email: req.body.email }, { name: name });
+    successResponse("data updated successfully", res);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   signIn,
   signUp,
+  userDetails,
 };
