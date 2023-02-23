@@ -8,6 +8,11 @@ const addMovieValidation = Joi.object({
   poster_api: Joi.string().min(1).max(2000).required(),
   movie_type: Joi.string().min(4).max(50).required(),
   is_released: Joi.boolean().required(),
+  language: Joi.array().items(Joi.string()).min(1).required(),
+  format: Joi.array().items(Joi.string()).min(1).required(),
+  hour: Joi.string().max(1).required(),
+  minute: Joi.string().max(2).required(),
+  date: Joi.string().required(),
 });
 
 const updateMovieValidation = Joi.object().keys({
@@ -16,6 +21,11 @@ const updateMovieValidation = Joi.object().keys({
   poster_api: Joi.string().min(1).max(2000).required(),
   movie_type: Joi.string().min(4).max(50).required(),
   is_released: Joi.boolean().required(),
+  language: Joi.array().items(Joi.string()).min(1).required(),
+  format: Joi.array().items(Joi.string()).min(1).required(),
+  hour: Joi.string().max(1).required(),
+  minute: Joi.string().max(2).required(),
+  date: Joi.string().required(),
 });
 
 const registerUserValidation = Joi.object().keys({
@@ -46,9 +56,15 @@ const forgotPasswordValidation = Joi.object().keys({
     .max(10)
     .required(),
 });
+
+const addShowValidation = Joi.object().keys({
+  title: Joi.string().required(),
+  time: Joi.string().required(),
+});
 module.exports = {
   addMovieValidation,
   updateMovieValidation,
   registerUserValidation,
   forgotPasswordValidation,
+  addShowValidation,
 };

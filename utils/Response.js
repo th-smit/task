@@ -1,7 +1,7 @@
 const successResponse = (successMessage, res) => {
   res
-    .set({ Authorization: successMessage.token })
     .status(200)
+    .set({ Authorization: successMessage.token })
     .json({ successMessage });
 };
 

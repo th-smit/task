@@ -16,6 +16,21 @@ const MovieSchema = new mongoose.Schema(
     movie_type: {
       type: String,
     },
+    language: {
+      type: [String],
+    },
+    format: {
+      type: [String],
+    },
+    hour: {
+      type: String,
+    },
+    minute: {
+      type: String,
+    },
+    date: {
+      type: String,
+    },
     is_released: {},
   },
   { timestamps: true }

@@ -21,6 +21,7 @@ const addMovies = async (req, res) => {
   console.log(req.body);
   try {
     const value = await addMovieValidation.validateAsync(req.body);
+    console.log(value);
     if (value) {
       const dataObj = new Movie({
         title: req.body.title,
@@ -28,8 +29,13 @@ const addMovies = async (req, res) => {
         poster_api: req.body.poster_api,
         movie_type: req.body.movie_type,
         is_released: req.body.is_released,
+        language: req.body.language,
+        format: req.body.format,
+        hour: req.body.hour,
+        minute: req.body.minute,
+        date: req.body.date,
       });
-
+      console.log("dataObj " + dataObj);
       const moviesData = await dataObj.save();
       successResponse(moviesData, res);
     }
@@ -39,7 +45,7 @@ const addMovies = async (req, res) => {
 };
 
 const updateMovies = async (req, res) => {
-  console.log(req.body);
+  console.log("from backend" + req.body);
   console.log(req.params.id);
   try {
     const moviesData = await Movie.findOne({ _id: req.params.id });
@@ -63,6 +69,21 @@ const updateMovies = async (req, res) => {
       }
       if (req.body.is_released) {
         updatedMoviesData.is_released = req.body.is_released;
+      }
+      if (req.body.language) {
+        updatedMoviesData.language = req.body.language;
+      }
+      if (req.body.format) {
+        updatedMoviesData.format = req.body.format;
+      }
+      if (req.body.hour) {
+        updatedMoviesData.hour = req.body.hour;
+      }
+      if (req.body.minute) {
+        updatedMoviesData.minute = req.body.minute;
+      }
+      if (req.body.date) {
+        updatedMoviesData.date = req.body.date;
       }
 
       const value = await updateMovieValidation.validateAsync(req.body);
