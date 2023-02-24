@@ -23,6 +23,7 @@ app.use("/pwd", require("./routes/otpRoutes"));
 app.use("/users", require("./routes/userRoutes"));
 app.use("/movie", require("./routes/movieRoutes"));
 app.use("/show", require("./routes/showRoutes"));
+app.use("/ticket", require("./routes/ticketRoutes"));
 
 //port
 const PORT = 8080;

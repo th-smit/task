@@ -2,17 +2,12 @@ const express = require("express");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
 
-const {
-  getShow,
-  addShow,
-  updateShow,
-} = require("../controller/showController");
+const { updateTicket } = require("../controller/ticketController");
 
-router.get("/", getShow);
+// router.get("/", getShow);
+//router.post("/", addTicket);
 
-router.post("/", addShow);
-
-router.put("/:id", updateShow);
+router.put("/", updateTicket);
 
 // router.delete("/:title", auth, deleteShow);
 

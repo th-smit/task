@@ -59,7 +59,12 @@ const forgotPasswordValidation = Joi.object().keys({
 
 const addShowValidation = Joi.object().keys({
   title: Joi.string().required(),
-  time: Joi.string().required(),
+  datetime: Joi.date().required(),
+});
+
+const updateShowValidation = Joi.object().keys({
+  title: Joi.string().required(),
+  datetime: Joi.date().required(),
 });
 module.exports = {
   addMovieValidation,
@@ -67,4 +72,5 @@ module.exports = {
   registerUserValidation,
   forgotPasswordValidation,
   addShowValidation,
+  updateShowValidation,
 };
