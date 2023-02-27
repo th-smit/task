@@ -21,6 +21,7 @@ const updateTicket = async (req, res) => {
   console.log("from the update Ticket seat " + req.body.seat);
   console.log("from the update Ticket movie title " + req.body.movieTitle);
   console.log("from the update Ticket time " + req.body.time);
+  console.log("from the update Ticket date " + req.body.date);
 
   try {
     const movieShowData = await Show.find({ title: req.body.movieTitle });

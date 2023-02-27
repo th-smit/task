@@ -33,7 +33,7 @@ const addMovies = async (req, res) => {
         format: req.body.format,
         hour: req.body.hour,
         minute: req.body.minute,
-        datetime: req.body.datetime,
+        date: req.body.date,
       });
       console.log("dataObj " + dataObj);
       const moviesData = await dataObj.save();
