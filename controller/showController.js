@@ -17,12 +17,13 @@ const getShow = async (req, res) => {
     const ed = new Date(req.query.date);
     ed.setDate(st.getDate() + 1);
 
+    const ct = new Date();
     console.log("hello from the get ");
     console.log("date formate " + req.query.date);
     console.log(req.query.title);
     const sortedData = await Show.find({
       title: req.query.title,
-      datetime: { $gte: st, $lt: ed },
+      datetime: { $gt: st, $gte: ct, $lt: ed },
     });
     successResponse(sortedData, res);
   } catch (err) {
@@ -31,23 +32,35 @@ const getShow = async (req, res) => {
 };
 
 const addShow = async (req, res) => {
-  console.log(req.body);
+  console.log("body data" + JSON.stringify(req.body));
   console.log("show date " + req.body.datetime);
-  console.log(typeof req.body.datetime);
+  console.log(typeof new Date(req.body.datetime));
   try {
-    const value = await addShowValidation.validateAsync(req.body);
-    console.log(value);
-    if (value) {
-      const dataObj = new Show({
-        title: req.body.title,
-        datetime: req.body.datetime,
-      });
-      console.log("showObj " + dataObj);
-      const showData = await dataObj.save();
-      successResponse(showData, res);
+    const existData = await Show.find({
+      title: req.body.title,
+      datetime: new Date(req.body.datetime),
+    });
+    if (!(existData.length == 0)) {
+      errorResponse({ err: "already show exist on selected date" }, res, 501);
+    } else {
+      const value = await addShowValidation.validateAsync(req.body);
+      console.log(value);
+
+      if (value) {
+        const sethm = new Date(req.body.datetime);
+        sethm.setSeconds(0);
+        sethm.setMilliseconds(0);
+        const dataObj = new Show({
+          title: req.body.title,
+          datetime: sethm,
+        });
+        console.log("showObj " + dataObj);
+        const showData = await dataObj.save();
+        successResponse(showData, res);
+      }
     }
   } catch (err) {
-    errorResponse(err.details[0]?.message, res, 501);
+    errorResponse(err, res, 501);
   }
 };
 

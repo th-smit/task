@@ -18,13 +18,17 @@ const {
 // };
 
 const updateTicket = async (req, res) => {
-  console.log("from the update Ticket seat " + req.body.seat);
-  console.log("from the update Ticket movie title " + req.body.movieTitle);
-  console.log("from the update Ticket time " + req.body.time);
-  console.log("from the update Ticket date " + req.body.date);
+  //console.log("ticket object " + JSON.stringify(req.body));
+  console.log("datetime  " + req.body.date);
+  // console.log("from the update Ticket movie title " + req.body.movieTitle);
+  // console.log("from the update Ticket time " + req.body.time);
+  // console.log("from the update Ticket date " + req.body.date);
 
   try {
-    const movieShowData = await Show.find({ title: req.body.movieTitle });
+    const movieShowData = await Show.find({
+      title: req.body.movieTitle,
+      datetime: req.body.date,
+    });
     if (movieShowData) {
       console.log(movieShowData[0].seat);
       console.log(req.body.seat);

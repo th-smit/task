@@ -1,4 +1,5 @@
 const Movie = require("../models/movieModel");
+const Show = require("../models/showModel");
 
 const { successResponse, errorResponse } = require("../utils/Response");
 const {
@@ -107,9 +108,12 @@ const updateMovies = async (req, res) => {
 const deleteMovies = async (req, res) => {
   console.log("from deleteMovies  " + req.params.title);
   try {
-    // await Movie.findById(req.body.userEmail);
+    console.log("movie delete");
     const resultedData = await Movie.deleteOne({ title: req.params.title });
-    successResponse(resultedData, res);
+    console.log("shoe delete");
+    const deletedMovie = await Show.deleteMany({ title: req.params.title });
+    console.log("both deleted");
+    successResponse("deleted", res);
   } catch (err) {
     errorResponse("id does not exist", res, 500);
   }
