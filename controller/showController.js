@@ -25,6 +25,10 @@ const getShow = async (req, res) => {
       title: req.query.title,
       datetime: { $gt: st, $gte: ct, $lt: ed },
     });
+    const deletedshow = await Show.deleteMany({
+      title: req.query.title,
+      datetime: { $lte: ct },
+    });
     successResponse(sortedData, res);
   } catch (err) {
     errorResponse(err, res, 404);
@@ -32,27 +36,43 @@ const getShow = async (req, res) => {
 };
 
 const addShow = async (req, res) => {
-  console.log("body data" + JSON.stringify(req.body));
-  console.log("show date " + req.body.datetime);
-  console.log(typeof new Date(req.body.datetime));
+  console.log("start time " + req.body.datetime);
+  let endtime = new Date(req.body.datetime);
+  const ct = new Date();
+  console.log("current date " + ct);
+  endtime.setHours(endtime.getHours() + req.body.hour);
+  endtime.setMinutes(endtime.getMinutes() + req.body.minute);
+  // console.log("end time " + endtime);
+  // console.log("hours " + req.body.hour);
+  // console.log("minutes " + req.body.minute);
+  // console.log(req.body.title);
+  if (ct > new Date(req.body.datetime)) {
+    console.log("invalid");
+  } else {
+    console.log("valid");
+  }
   try {
     const existData = await Show.find({
+      endtime: { $gt: req.body.datetime },
       title: req.body.title,
-      datetime: new Date(req.body.datetime),
     });
-    if (!(existData.length == 0)) {
+
+    if (existData.length !== 0) {
       errorResponse({ err: "already show exist on selected date" }, res, 501);
     } else {
       const value = await addShowValidation.validateAsync(req.body);
-      console.log(value);
+      //console.log(value);
 
       if (value) {
         const sethm = new Date(req.body.datetime);
         sethm.setSeconds(0);
         sethm.setMilliseconds(0);
+        endtime.setSeconds(0);
+        endtime.setMilliseconds(0);
         const dataObj = new Show({
           title: req.body.title,
           datetime: sethm,
+          endtime: endtime,
         });
         console.log("showObj " + dataObj);
         const showData = await dataObj.save();

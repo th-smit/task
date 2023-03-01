@@ -12,6 +12,9 @@ const ShowSchema = new mongoose.Schema(
     datetime: {
       type: Date,
     },
+    endtime: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

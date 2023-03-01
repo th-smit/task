@@ -60,6 +60,8 @@ const forgotPasswordValidation = Joi.object().keys({
 const addShowValidation = Joi.object().keys({
   title: Joi.string().required(),
   datetime: Joi.date().required(),
+  hour: Joi.number().required(),
+  minute: Joi.number().required(),
 });
 
 const updateShowValidation = Joi.object().keys({
