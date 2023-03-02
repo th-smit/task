@@ -2,13 +2,17 @@ const express = require("express");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
 
-const { updateTicket } = require("../controller/ticketController");
+const {
+  addTicket,
+  getTicket,
+  deleteTicket,
+} = require("../controller/ticketController");
 
-// router.get("/", getShow);
+router.get("/", getTicket);
 //router.post("/", addTicket);
 
-router.put("/", updateTicket);
+router.post("/", addTicket);
 
-// router.delete("/:title", auth, deleteShow);
+router.delete("/", deleteTicket);
 
 module.exports = router;

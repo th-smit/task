@@ -1,10 +1,11 @@
 const Show = require("../models/showModel");
-
+const Ticket = require("../models/ticketModel");
 const { successResponse, errorResponse } = require("../utils/Response");
 const {
   addShowValidation,
   updateShowValidation,
 } = require("../middleware/validationMiddleware");
+const ticketModel = require("../models/ticketModel");
 
 const getShow = async (req, res) => {
   try {
@@ -126,11 +127,19 @@ const updateShow = async (req, res) => {
 const deleteShow = async (req, res) => {
   console.log(req.params.id);
   try {
-    // await Movie.findById(req.body.userEmail);
-    const resultedData = await Show.deleteOne({ _id: req.params.id });
-    successResponse(resultedData, res);
+    const check = await Show.findById(req.params.id);
+    console.log(check.seat.length);
+    if (check.seat.length > 10) {
+      console.log("show can't be deleted");
+    } else {
+      const resultedData = await Show.deleteOne({ _id: req.params.id });
+      const Data = await Ticket.deleteMany({
+        show_id: req.params.id,
+      });
+      successResponse("deleted successfully", res);
+    }
   } catch (err) {
-    errorResponse("id does not exist", res, 500);
+    errorResponse(err, res, 500);
   }
 };
 

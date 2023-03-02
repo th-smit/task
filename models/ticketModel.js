@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 //schema design
 const TicketSchema = new mongoose.Schema(
   {
-    name: {
+    user_name: {
       type: String,
     },
     movie_title: {
@@ -17,6 +17,12 @@ const TicketSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
+    },
+    email: {
+      type: String,
+    },
+    show_id: {
+      type: String,
     },
   },
   { timestamps: true }
