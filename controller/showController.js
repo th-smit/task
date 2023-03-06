@@ -31,8 +31,19 @@ const getShow = async (req, res) => {
       datetime: { $lte: ct },
     });
     successResponse(sortedData, res);
-  } catch (err) {
-    errorResponse(err, res, 404);
+  } catch (error) {
+    errorResponse(error, res, 404);
+  }
+};
+
+const getShowSeat = async (req, res) => {
+  try {
+    console.log("particular show id " + req.params.id);
+    const showData = await Show.find({ _id: req.params.id });
+    console.log(showData);
+    successResponse(showData, res);
+  } catch (error) {
+    errorResponse(error, res, 404);
   }
 };
 
@@ -145,6 +156,7 @@ const deleteShow = async (req, res) => {
 
 module.exports = {
   getShow,
+  getShowSeat,
   addShow,
   updateShow,
   deleteShow,

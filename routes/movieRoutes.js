@@ -9,11 +9,11 @@ const {
   deleteMovies,
 } = require("../controller/movieController");
 
-router.get("/", auth, getMovies);
+router.get("/", getMovies);
 
-router.post("/", auth, addMovies);
+router.post("/", addMovies);
 
-router.put("/:id", auth, updateMovies);
+router.put("/:id", updateMovies);
 
 router.delete("/:title", auth, deleteMovies);
 
