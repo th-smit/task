@@ -71,9 +71,6 @@ const signIn = async (req, res) => {
 
 const userDetails = async (req, res) => {
   const { email, name } = req.body;
-  // console.log(email);
-  // console.log(name);
-  // const userDetailsmail = await User.findOne({ email: req.body.email });
   try {
     await User.findOneAndUpdate({ email: req.body.email }, { name: name });
     successResponse("data updated successfully", res);

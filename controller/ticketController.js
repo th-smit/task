@@ -56,6 +56,7 @@ const addTicket = async (req, res) => {
     }
   } catch (error) {
     // errorResponse({ error: "seat already booked" }, res, 501);
+    console.log(error);
     errorResponse(error, res, 501);
   }
 };
