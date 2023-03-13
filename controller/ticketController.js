@@ -36,7 +36,6 @@ const addTicket = async (req, res) => {
         movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
         movieShowData[0].save();
 
-        //details store in ticket table
         const userTicket = new Ticket({
           user_name: req.body.username,
           movie_title: req.body.movieTitle,
@@ -51,11 +50,10 @@ const addTicket = async (req, res) => {
 
         successResponse(movieShowData[0], res);
       } else {
-        throw new Error();
+        errorResponse("selected seat already booked", res, 501);
       }
     }
   } catch (error) {
-    // errorResponse({ error: "seat already booked" }, res, 501);
     console.log(error);
     errorResponse(error, res, 501);
   }
@@ -81,11 +79,10 @@ const deleteTicket = async (req, res) => {
         st.seat = st.seat.filter((value2) => value1 !== value2);
       });
       await st.save();
+      successResponse(st, res);
     } else {
-      console.log("invalid cancel ticket");
+      errorResponse("can't delete your ticket", res, 500);
     }
-
-    successResponse(st, res);
   } catch (error) {
     errorResponse(error, res, 500);
   }

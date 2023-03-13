@@ -108,12 +108,17 @@ const updateMovies = async (req, res) => {
 const deleteMovies = async (req, res) => {
   console.log("from deleteMovies  " + req.params.title);
   try {
-    console.log("movie delete");
-    const resultedData = await Movie.deleteOne({ title: req.params.title });
-    console.log("shoe delete");
-    const deletedMovie = await Show.deleteMany({ title: req.params.title });
-    console.log("both deleted");
-    successResponse("deleted", res);
+    const cdeletedMovie = await Show.findOne({ title: req.params.title });
+    if (cdeletedMovie) {
+      errorResponse("show is available so can't delete the movie", res, 501);
+    } else {
+      console.log("movie delete");
+      const resultedData = await Movie.deleteOne({ title: req.params.title });
+      console.log("movie deleted");
+      // const deletedMovie = await Show.deleteMany({ title: req.params.title });
+      // console.log("both deleted");
+      successResponse("deleted", res);
+    }
   } catch (err) {
     errorResponse("id does not exist", res, 500);
   }
