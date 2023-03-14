@@ -9,28 +9,35 @@ const ticketModel = require("../models/ticketModel");
 
 const getShow = async (req, res) => {
   try {
-    const st = new Date(req.query.date);
-    st.setHours(0);
-    st.setMinutes(0);
-    st.setSeconds(0);
-    st.setMilliseconds(0);
+    if (req.query.date) {
+      const st = new Date(req.query.date);
+      st.setHours(0);
+      st.setMinutes(0);
+      st.setSeconds(0);
+      st.setMilliseconds(0);
 
-    const ed = new Date(req.query.date);
-    ed.setDate(st.getDate() + 1);
+      const ed = new Date(req.query.date);
+      ed.setDate(st.getDate() + 1);
 
-    const ct = new Date();
-    console.log("hello from the get ");
-    console.log("date formate " + req.query.date);
-    console.log(req.query.title);
-    const sortedData = await Show.find({
-      title: req.query.title,
-      datetime: { $gt: st, $gte: ct, $lt: ed },
-    });
-    const deletedshow = await Show.deleteMany({
-      title: req.query.title,
-      datetime: { $lte: ct },
-    });
-    successResponse(sortedData, res);
+      const ct = new Date();
+      console.log("hello from the get ");
+      console.log("date formate " + req.query.date);
+      console.log(req.query.title);
+      const sortedData = await Show.find({
+        title: req.query.title,
+        datetime: { $gt: st, $gte: ct, $lt: ed },
+      });
+      const deletedshow = await Show.deleteMany({
+        title: req.query.title,
+        datetime: { $lte: ct },
+      });
+      successResponse(sortedData, res);
+    } else {
+      const sortedData = await Show.find({
+        title: req.query.title,
+      });
+      successResponse(sortedData, res);
+    }
   } catch (error) {
     errorResponse(error, res, 404);
   }

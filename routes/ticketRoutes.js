@@ -5,11 +5,12 @@ const router = express.Router();
 const {
   addTicket,
   getTicket,
+  checkTicket,
   deleteTicket,
 } = require("../controller/ticketController");
 
 router.get("/", getTicket);
-//router.post("/", addTicket);
+router.post("/checkticket", checkTicket);
 
 router.post("/", addTicket);
 

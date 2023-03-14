@@ -17,6 +17,35 @@ const getTicket = async (req, res) => {
   }
 };
 
+const checkTicket = async (req, res) => {
+  try {
+    const movieShowData = await Show.find({
+      title: req.body.movieTitle,
+      datetime: req.body.date,
+    });
+    if (movieShowData) {
+      // console.log(movieShowData[0].seat);
+      // console.log(req.body.seat);
+      // console.log(typeof req.body.seat);
+
+      let oldData = movieShowData[0].seat;
+      let selectedSeatData = req.body.seat;
+
+      if (oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
+        console.log("olddata " + oldData);
+        errorResponse("selected seat already booked", res, 501);
+      } else {
+        successResponse(selectedSeatData, res);
+      }
+    }
+    // else{
+    //   errorResponse("can't fetch the movie data", res, 501);
+    // }
+  } catch (error) {
+    errorResponse(error, res, 501);
+  }
+};
+
 const addTicket = async (req, res) => {
   console.log("from the addTicket showid is " + req.body.showid);
   try {
@@ -46,9 +75,9 @@ const addTicket = async (req, res) => {
           show_id: req.body.showid,
         });
         const userTicketData = await userTicket.save();
-        console.log(userTicketData);
+        console.log("userticket " + userTicketData.seat);
 
-        successResponse(movieShowData[0], res);
+        successResponse(userTicketData.seat, res);
       } else {
         errorResponse("selected seat already booked", res, 501);
       }
@@ -91,5 +120,6 @@ const deleteTicket = async (req, res) => {
 module.exports = {
   addTicket,
   getTicket,
+  checkTicket,
   deleteTicket,
 };
