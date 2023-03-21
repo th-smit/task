@@ -8,13 +8,19 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const getMovies = async (req, res) => {
+  console.log(req.query);
   try {
-    const sortedData = await Movie.find({
-      title: { $regex: req.query.title, $options: "i" },
-    }).sort(req.query.sortedby);
-    successResponse(sortedData, res);
-  } catch (err) {
-    errorResponse(err, res, 404);
+    if (!req.query) {
+      const sortedData = await Movie.find({
+        title: { $regex: req.query.title, $options: "i" },
+      }).sort(req.query.sortedby);
+      successResponse(sortedData, res);
+    } else {
+      const movieData = await Movie.find();
+      successResponse(movieData, res);
+    }
+  } catch (error) {
+    errorResponse(error, res, 404);
   }
 };
 

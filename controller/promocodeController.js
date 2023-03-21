@@ -57,7 +57,65 @@ const addPromoCode = async (req, res) => {
   }
 };
 
+const editPromoCode = async (req, res) => {
+  // let promocodeData = "";
+  console.log("params " + req.params.id);
+  console.log("body data " + JSON.stringify(req.body));
+  try {
+    const promoData = await Promocode.findOne({ _id: req.params.id });
+    console.log("fetched data " + promoData);
+    if (!promoData) {
+      errorResponse("data does not exist", res, 404);
+    } else {
+      const updatedPromoData = promoData;
+      if (req.body.promo_name) {
+        updatedPromoData.promo_name = req.body.promo_name;
+      }
+
+      updatedPromoData.active_status = req.body.active_status;
+
+      if (req.body.count) {
+        updatedPromoData.limit = req.body.count;
+      }
+      if (req.body.promo_type) {
+        updatedPromoData.promocode_type = req.body.promo_type;
+      }
+      if (req.body.movies) {
+        updatedPromoData.movies = req.body.movies;
+      }
+      updatedPromoData.expiry_date = req.body.expiry_date;
+      if (true) {
+        await Promocode.findOneAndUpdate(
+          { _id: req.params.id },
+          {
+            $set: updatedPromoData,
+          },
+          { New: true }
+        );
+        successResponse(updatedPromoData, res);
+      }
+    }
+  } catch (error) {
+    errorResponse(error, res, 500);
+  }
+  // try {
+  //   if (!req.params.id) {
+  //     console.log("inside");
+  //     promocodeData = await Promocode.find();
+  //   } else {
+  //     //console.log(req.query.id);
+  //     promocodeData = await Promocode.find({ _id: req.params.id });
+  //   }
+  //   // promocodeData = await Promocode.find();
+  //   console.log("promo data " + promocodeData);
+  //   successResponse(promocodeData, res);
+  // } catch (err) {
+  //   errorResponse(err, res, 404);
+  // }
+};
+
 module.exports = {
   addPromoCode,
   getPromoCode,
+  editPromoCode,
 };
