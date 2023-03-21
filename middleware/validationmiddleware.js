@@ -68,6 +68,15 @@ const updateShowValidation = Joi.object().keys({
   title: Joi.string().required(),
   datetime: Joi.date().required(),
 });
+
+const addPromocodeValidation = Joi.object().keys({
+  promo_name: Joi.string().required(),
+  expiry_date: Joi.date().required(),
+  limit: Joi.number().required(),
+  promocode_type: Joi.string().required(),
+  active_status: Joi.boolean().required(),
+  movies: Joi.array().items(Joi.string()),
+});
 module.exports = {
   addMovieValidation,
   updateMovieValidation,
@@ -75,4 +84,5 @@ module.exports = {
   forgotPasswordValidation,
   addShowValidation,
   updateShowValidation,
+  addPromocodeValidation,
 };

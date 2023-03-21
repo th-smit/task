@@ -9,7 +9,9 @@ const {
 const getTicket = async (req, res) => {
   try {
     console.log(req.query.email);
-    const sortedData = await Ticket.find({ email: req.query.email });
+    const sortedData = await Ticket.find({ email: req.query.email }).sort({
+      show_datetime: 1,
+    });
     console.log(sortedData);
     successResponse(sortedData, res);
   } catch (err) {
@@ -24,10 +26,6 @@ const checkTicket = async (req, res) => {
       datetime: req.body.date,
     });
     if (movieShowData) {
-      // console.log(movieShowData[0].seat);
-      // console.log(req.body.seat);
-      // console.log(typeof req.body.seat);
-
       let oldData = movieShowData[0].seat;
       let selectedSeatData = req.body.seat;
 
