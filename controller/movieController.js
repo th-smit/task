@@ -8,17 +8,23 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const getMovies = async (req, res) => {
-  console.log(req.query);
+  console.log("title is " + req.query.title);
   try {
-    if (!req.query) {
+    // if (!req.query.title) {
+    if (req.query.title === null || req.query.title === undefined) {
+      const sortedData = await Movie.find();
+      successResponse(sortedData, res);
+    } else {
       const sortedData = await Movie.find({
         title: { $regex: req.query.title, $options: "i" },
       }).sort(req.query.sortedby);
       successResponse(sortedData, res);
-    } else {
-      const movieData = await Movie.find();
-      successResponse(movieData, res);
     }
+
+    // } else {
+    //   const movieData = await Movie.find();
+    //   successResponse(movieData, res);
+    // }
   } catch (error) {
     errorResponse(error, res, 404);
   }

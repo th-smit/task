@@ -6,6 +6,9 @@ const promocodeSchema = new mongoose.Schema(
     promo_name: {
       type: String,
     },
+    discount: {
+      type: Number,
+    },
     expiry_date: {
       type: Date,
     },

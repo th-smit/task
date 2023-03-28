@@ -63,43 +63,43 @@ const addShow = async (req, res) => {
   showendtime.setHours(showendtime.getHours() + req.body.hour);
   showendtime.setMinutes(showendtime.getMinutes() + req.body.minute);
   if (ct > new Date(req.body.datetime)) {
-    console.log("invalid");
+    errorResponse("invalid", res, 404);
   } else {
     console.log("valid");
-  }
-  try {
-    const existData = await Show.find({
-      $and: [
-        { endtime: { $gt: req.body.datetime } },
-        { datetime: { $lt: showendtime } },
-        { title: req.body.title },
-      ],
-    });
-    console.log("exist data " + existData);
+    try {
+      const existData = await Show.find({
+        $and: [
+          { endtime: { $gt: req.body.datetime } },
+          { datetime: { $lt: showendtime } },
+          { title: req.body.title },
+        ],
+      });
+      console.log("exist data " + existData);
 
-    if (existData.length !== 0) {
-      errorResponse({ err: "already show exist on selected date" }, res, 501);
-    } else {
-      const value = await addShowValidation.validateAsync(req.body);
+      if (existData.length !== 0) {
+        errorResponse({ err: "already show exist on selected date" }, res, 501);
+      } else {
+        const value = await addShowValidation.validateAsync(req.body);
 
-      if (value) {
-        const sethm = new Date(req.body.datetime);
-        sethm.setSeconds(0);
-        sethm.setMilliseconds(0);
-        showendtime.setSeconds(0);
-        showendtime.setMilliseconds(0);
-        const dataObj = new Show({
-          title: req.body.title,
-          datetime: sethm,
-          endtime: showendtime,
-        });
-        console.log("showObj " + dataObj);
-        const showData = await dataObj.save();
-        successResponse(showData, res);
+        if (value) {
+          const sethm = new Date(req.body.datetime);
+          sethm.setSeconds(0);
+          sethm.setMilliseconds(0);
+          showendtime.setSeconds(0);
+          showendtime.setMilliseconds(0);
+          const dataObj = new Show({
+            title: req.body.title,
+            datetime: sethm,
+            endtime: showendtime,
+          });
+          console.log("showObj " + dataObj);
+          const showData = await dataObj.save();
+          successResponse(showData, res);
+        }
       }
+    } catch (err) {
+      errorResponse(err, res, 501);
     }
-  } catch (err) {
-    errorResponse(err, res, 501);
   }
 };
 

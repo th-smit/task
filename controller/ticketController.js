@@ -1,5 +1,7 @@
 const Show = require("../models/showModel");
 const Ticket = require("../models/ticketModel");
+const UserPromo = require("../models/userPromoModel");
+const Promocode = require("../models/promocodeModel");
 const { successResponse, errorResponse } = require("../utils/Response");
 const {
   addShowValidation,
@@ -51,35 +53,119 @@ const addTicket = async (req, res) => {
       title: req.body.movieTitle,
       datetime: req.body.date,
     });
-    if (movieShowData) {
-      console.log(movieShowData[0].seat);
-      console.log(req.body.seat);
-      console.log(typeof req.body.seat);
 
-      let oldData = movieShowData[0].seat;
-      let selectedSeatData = req.body.seat;
+    let promoData = await Promocode.find({ promo_name: req.body.promoname });
+    let userPromoData = await UserPromo.find({
+      email: req.body.email,
+      promo_name: req.body.promoname,
+    });
+    console.log("userpromocode data " + userPromoData);
+    console.log("promocode data " + promoData);
+    //console.log("userpromocode data limit" + userPromoData[0].limit);
+    //console.log("promocode data limit" + promoData[0].limit);
+    if (userPromoData.length !== 0) {
+      if (promoData[0].limit > userPromoData[0].limit) {
+        //console.log("before update " + userPromoData.limit);
+        let update = userPromoData[0];
+        update.limit += 1;
+        console.log("after update " + update.limit);
+        await UserPromo.findOneAndUpdate(
+          { email: req.body.email, promo_name: req.body.promoname },
+          { $set: update },
+          { New: true }
+        );
+        console.log("update successfully");
+        if (movieShowData) {
+          let oldData = movieShowData[0].seat;
+          let selectedSeatData = req.body.seat;
 
-      if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
-        movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
-        movieShowData[0].save();
+          if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
+            movieShowData[0].seat = [
+              ...movieShowData[0].seat,
+              ...req.body.seat,
+            ];
+            movieShowData[0].save();
 
-        const userTicket = new Ticket({
-          user_name: req.body.username,
-          movie_title: req.body.movieTitle,
-          seat: req.body.seat,
-          show_datetime: req.body.date,
-          price: req.body.price,
-          email: req.body.email,
-          show_id: req.body.showid,
-        });
-        const userTicketData = await userTicket.save();
-        console.log("userticket " + userTicketData.seat);
+            const userTicket = new Ticket({
+              user_name: req.body.username,
+              movie_title: req.body.movieTitle,
+              seat: req.body.seat,
+              show_datetime: req.body.date,
+              price: req.body.price,
+              email: req.body.email,
+              show_id: req.body.showid,
+            });
+            const userTicketData = await userTicket.save();
 
-        successResponse(userTicketData.seat, res);
+            successResponse(userTicketData.seat, res);
+          } else {
+            errorResponse("selected seat already booked", res, 501);
+          }
+        }
       } else {
-        errorResponse("selected seat already booked", res, 501);
+        errorResponse("limit has reached ", res, 404);
+      }
+    } else {
+      console.log("second part run ");
+      // const data = new UserPromo({
+      //   email: req.body.email,
+
+      //   promo_id: req.body.promoid,
+      // });
+      // await data.save();
+      // console.log("successfully created");
+
+      if (movieShowData) {
+        let oldData = movieShowData[0].seat;
+        let selectedSeatData = req.body.seat;
+
+        if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
+          movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
+          movieShowData[0].save();
+
+          const userTicket = new Ticket({
+            user_name: req.body.username,
+            movie_title: req.body.movieTitle,
+            seat: req.body.seat,
+            show_datetime: req.body.date,
+            price: req.body.price,
+            email: req.body.email,
+            show_id: req.body.showid,
+          });
+          const userTicketData = await userTicket.save();
+
+          successResponse(userTicket, res);
+        } else {
+          errorResponse("selected seat already booked", res, 501);
+        }
       }
     }
+
+    // if (movieShowData) {
+
+    //   let oldData = movieShowData[0].seat;
+    //   let selectedSeatData = req.body.seat;
+
+    //   if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
+    //     movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
+    //     movieShowData[0].save();
+
+    //     const userTicket = new Ticket({
+    //       user_name: req.body.username,
+    //       movie_title: req.body.movieTitle,
+    //       seat: req.body.seat,
+    //       show_datetime: req.body.date,
+    //       price: req.body.price,
+    //       email: req.body.email,
+    //       show_id: req.body.showid,
+    //     });
+    //     const userTicketData = await userTicket.save();
+
+    //     successResponse(userTicketData.seat, res);
+    //   } else {
+    //     errorResponse("selected seat already booked", res, 501);
+    //   }
+    // }
   } catch (error) {
     console.log(error);
     errorResponse(error, res, 501);

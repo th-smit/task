@@ -71,6 +71,7 @@ const updateShowValidation = Joi.object().keys({
 
 const addPromocodeValidation = Joi.object().keys({
   promo_name: Joi.string().required(),
+  discount: Joi.number().required(),
   expiry_date: Joi.date().required(),
   limit: Joi.number().required(),
   promocode_type: Joi.string().required(),

@@ -22,6 +22,8 @@ app.use("/movie", require("./routes/movieRoutes"));
 app.use("/show", require("./routes/showRoutes"));
 app.use("/ticket", require("./routes/ticketRoutes"));
 app.use("/promocode", require("./routes/promocodeRoutes"));
+app.use("/userpromo", require("./routes/userRoutes"));
+app.use("/getuserpromo", require("./routes/promocodeRoutes"));
 
 //port
 const PORT = 8080;

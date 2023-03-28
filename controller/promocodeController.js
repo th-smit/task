@@ -1,5 +1,5 @@
-const Movie = require("../models/movieModel");
 const Promocode = require("../models/promocodeModel");
+const UserPromoCode = require("../models/userPromoModel");
 
 const { successResponse, errorResponse } = require("../utils/Response");
 const {
@@ -7,21 +7,50 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const getPromoCode = async (req, res) => {
-  let promocodeData = "";
-  console.log("paramas" + req.params.id);
   try {
-    if (!req.params.id) {
-      console.log("inside");
-      promocodeData = await Promocode.find();
-    } else {
-      //console.log(req.query.id);
-      promocodeData = await Promocode.find({ _id: req.params.id });
-    }
-    // promocodeData = await Promocode.find();
-    console.log("promo data " + promocodeData);
+    console.log("from the req " + req.params.email);
+    const promocodeData = await Promocode.find();
     successResponse(promocodeData, res);
-  } catch (err) {
-    errorResponse(err, res, 404);
+  } catch (error) {
+    errorResponse(error, res, 500);
+  }
+
+  // console.log("user promo data " + userPromoData);
+  // console.log("type of userpromodata " + typeof userPromoData);
+
+  // const PromoData = await Promocode.find()
+
+  // PromoData.map(getpromo)
+
+  // function getpromo(data)
+  // {
+  //   if(data.promo_name == )
+  // }
+
+  // try {
+  //   // if (!req.params.id) {
+  //   //   console.log("inside");
+  //   //   promocodeData = await Promocode.find();
+  //   // } else {
+  //   //   //console.log(req.query.id);
+  //   //   promocodeData = await Promocode.find({ _id: req.params.id });
+  //   // }
+  //   const promocodeData = await Promocode.find();
+  //   console.log("promo data " + promocodeData);
+  //   successResponse(promocodeData, res);
+  // } catch (err) {
+  //   errorResponse(err, res, 404);
+  // }
+};
+
+const getUserPromo = async (req, res) => {
+  console.log("req. params is " + req.params.email);
+  try {
+    const userPromoData = await UserPromoCode.find({ email: req.params.email });
+    console.log(userPromoData);
+    successResponse(userPromoData, res);
+  } catch (error) {
+    errorResponse(error, res, 404);
   }
 };
 
@@ -39,10 +68,12 @@ const addPromoCode = async (req, res) => {
       if (promocodeData.length === 0) {
         const dataObj = new Promocode({
           promo_name: req.body.promo_name,
+          discount: req.body.discount,
           expiry_date: req.body.expiry_date,
           limit: req.body.limit,
           promocode_type: req.body.promocode_type,
           active_status: req.body.active_status,
+          movies: req.body.movies,
         });
         console.log("dataObj " + dataObj);
         const moviesData = await dataObj.save();
@@ -58,7 +89,6 @@ const addPromoCode = async (req, res) => {
 };
 
 const editPromoCode = async (req, res) => {
-  // let promocodeData = "";
   console.log("params " + req.params.id);
   console.log("body data " + JSON.stringify(req.body));
   try {
@@ -118,4 +148,5 @@ module.exports = {
   addPromoCode,
   getPromoCode,
   editPromoCode,
+  getUserPromo,
 };
