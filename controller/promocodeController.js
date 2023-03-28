@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+
 const Promocode = require("../models/promocodeModel");
 const UserPromoCode = require("../models/userPromoModel");
 
@@ -7,63 +9,65 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const getPromoCode = async (req, res) => {
+  let promoArray = [];
   try {
-    console.log("from the req " + req.params.email);
-    const promocodeData = await Promocode.find();
-    successResponse(promocodeData, res);
+    if (req.params.email) {
+      const promocodeData = await Promocode.find({
+        movies: { $in: [req.params.movie_title] },
+      });
+
+      const userPromocodeData = await UserPromoCode.find({
+        email: req.params.email,
+      });
+
+      const userPromocodes = userPromocodeData.map((data) => data.promo_name);
+
+      // eslint-disable-next-line consistent-return
+      promocodeData.map((data) => {
+        if (userPromocodes.includes(data.promo_name)) {
+          // eslint-disable-next-line consistent-return, array-callback-return
+          return userPromocodeData.map((data1) => {
+            if (data1.promo_name === data.promo_name) {
+              if (data.limit > data1.limit) {
+                if (data.active_status && data.expiry_date > new Date()) {
+                  promoArray.push(data);
+                  return data;
+                }
+              }
+            }
+          });
+        }
+        if (data.active_status && data.expiry_date > new Date()) {
+          promoArray.push(data);
+          return data;
+        }
+      });
+      successResponse(promoArray, res);
+    } else {
+      if (req.query.id) {
+        const promoCodeData = await Promocode.find({ _id: req.query.id });
+        successResponse(promoCodeData, res);
+      } else {
+        const promoCodeData = await Promocode.find();
+        successResponse(promoCodeData, res);
+      }
+    }
   } catch (error) {
     errorResponse(error, res, 500);
-  }
-
-  // console.log("user promo data " + userPromoData);
-  // console.log("type of userpromodata " + typeof userPromoData);
-
-  // const PromoData = await Promocode.find()
-
-  // PromoData.map(getpromo)
-
-  // function getpromo(data)
-  // {
-  //   if(data.promo_name == )
-  // }
-
-  // try {
-  //   // if (!req.params.id) {
-  //   //   console.log("inside");
-  //   //   promocodeData = await Promocode.find();
-  //   // } else {
-  //   //   //console.log(req.query.id);
-  //   //   promocodeData = await Promocode.find({ _id: req.params.id });
-  //   // }
-  //   const promocodeData = await Promocode.find();
-  //   console.log("promo data " + promocodeData);
-  //   successResponse(promocodeData, res);
-  // } catch (err) {
-  //   errorResponse(err, res, 404);
-  // }
-};
-
-const getUserPromo = async (req, res) => {
-  console.log("req. params is " + req.params.email);
-  try {
-    const userPromoData = await UserPromoCode.find({ email: req.params.email });
-    console.log(userPromoData);
-    successResponse(userPromoData, res);
-  } catch (error) {
-    errorResponse(error, res, 404);
   }
 };
 
 const addPromoCode = async (req, res) => {
-  console.log(req.body);
+  console.log("body data", req.body);
   try {
+    const promocodeData = await Promocode.find({
+      promo_name: req.body.promo_name,
+    });
+    console.log("promocode length ", promocodeData.length);
+
     const value = await addPromocodeValidation.validateAsync(req.body);
     console.log(value);
     if (value) {
-      const promocodeData = await Promocode.find({
-        promo_name: req.body.promocode,
-      });
-
       console.log("fetched promocode data " + promocodeData.length);
       if (promocodeData.length === 0) {
         const dataObj = new Promocode({
@@ -128,25 +132,10 @@ const editPromoCode = async (req, res) => {
   } catch (error) {
     errorResponse(error, res, 500);
   }
-  // try {
-  //   if (!req.params.id) {
-  //     console.log("inside");
-  //     promocodeData = await Promocode.find();
-  //   } else {
-  //     //console.log(req.query.id);
-  //     promocodeData = await Promocode.find({ _id: req.params.id });
-  //   }
-  //   // promocodeData = await Promocode.find();
-  //   console.log("promo data " + promocodeData);
-  //   successResponse(promocodeData, res);
-  // } catch (err) {
-  //   errorResponse(err, res, 404);
-  // }
 };
 
 module.exports = {
   addPromoCode,
   getPromoCode,
   editPromoCode,
-  getUserPromo,
 };

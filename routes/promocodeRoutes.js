@@ -6,12 +6,9 @@ const {
   addPromoCode,
   getPromoCode,
   editPromoCode,
-  getUserPromo,
 } = require("../controller/promocodeController");
 
-router.get("/:email?", getPromoCode);
-
-router.get("/promo/:email?", getUserPromo);
+router.get("/:email?/:movie_title?", getPromoCode);
 
 router.post("/", addPromoCode);
 
