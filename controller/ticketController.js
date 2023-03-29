@@ -46,66 +46,77 @@ const checkTicket = async (req, res) => {
 
 const addTicket = async (req, res) => {
   try {
-    const movieShowData = await Show.find({
-      title: req.body.movieTitle,
-      datetime: req.body.date,
+    let promoData = await Promocode.find({
+      promo_name: req.body.promoname,
+      expiry_date: { $gt: new Date() },
     });
 
-    let promoData = await Promocode.find({ promo_name: req.body.promoname });
     let userPromoData = await UserPromo.find({
       email: req.body.email,
       promo_name: req.body.promoname,
     });
 
-    if (req.body.promoname) {
-      if (userPromoData.length !== 0) {
-        if (promoData[0].limit > userPromoData[0].limit) {
-          let update = userPromoData[0];
-          update.limit += 1;
-          console.log("after update " + update.limit);
-          await UserPromo.findOneAndUpdate(
-            { email: req.body.email, promo_name: req.body.promoname },
-            { $set: update },
-            { New: true }
-          );
+    console.log("promo name is ", req.body.promoname);
+    console.log("length is ", promoData.length);
+
+    if (promoData.length !== 0) {
+      const movieShowData = await Show.find({
+        title: req.body.movieTitle,
+        datetime: req.body.date,
+      });
+
+      if (req.body.promoname) {
+        if (userPromoData.length !== 0) {
+          if (promoData[0].limit > userPromoData[0].limit) {
+            let update = userPromoData[0];
+            update.limit += 1;
+            console.log("after update " + update.limit);
+            await UserPromo.findOneAndUpdate(
+              { email: req.body.email, promo_name: req.body.promoname },
+              { $set: update },
+              { New: true }
+            );
+          } else {
+            errorResponse("limit has reached ", res, 404);
+          }
         } else {
-          errorResponse("limit has reached ", res, 404);
+          console.log("second part run ");
+          const data = new UserPromo({
+            email: req.body.email,
+            promo_name: req.body.promoname,
+            promo_id: req.body.promoid,
+          });
+          await data.save();
+          console.log("successfully created");
         }
-      } else {
-        console.log("second part run ");
-        const data = new UserPromo({
-          email: req.body.email,
-          promo_name: req.body.promoname,
-          promo_id: req.body.promoid,
-        });
-        await data.save();
-        console.log("successfully created");
       }
-    }
 
-    if (movieShowData) {
-      let oldData = movieShowData[0].seat;
-      let selectedSeatData = req.body.seat;
+      if (movieShowData) {
+        let oldData = movieShowData[0].seat;
+        let selectedSeatData = req.body.seat;
 
-      if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
-        movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
-        movieShowData[0].save();
+        if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
+          movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
+          movieShowData[0].save();
 
-        const userTicket = new Ticket({
-          user_name: req.body.username,
-          movie_title: req.body.movieTitle,
-          seat: req.body.seat,
-          show_datetime: req.body.date,
-          price: req.body.price,
-          email: req.body.email,
-          show_id: req.body.showid,
-        });
-        const userTicketData = await userTicket.save();
+          const userTicket = new Ticket({
+            user_name: req.body.username,
+            movie_title: req.body.movieTitle,
+            seat: req.body.seat,
+            show_datetime: req.body.date,
+            price: req.body.price,
+            email: req.body.email,
+            show_id: req.body.showid,
+          });
+          const userTicketData = await userTicket.save();
 
-        successResponse(userTicketData.seat, res);
-      } else {
-        errorResponse("selected seat already booked", res, 501);
+          successResponse(userTicketData.seat, res);
+        } else {
+          errorResponse("selected seat already booked", res, 501);
+        }
       }
+    } else {
+      errorResponse("coupen code not available", res, 501);
     }
   } catch (error) {
     console.log(error);

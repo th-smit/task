@@ -35,7 +35,10 @@ const getShow = async (req, res) => {
       });
       successResponse(sortedData, res);
     } else {
-      const sortedData = await Show.find({ title: req.query.title }).sort({
+      const sortedData = await Show.find({
+        title: req.query.title,
+        datetime: { $gt: new Date() },
+      }).sort({
         datetime: 1,
       });
       successResponse(sortedData, res);

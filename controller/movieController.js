@@ -1,6 +1,6 @@
 const Movie = require("../models/movieModel");
 const Show = require("../models/showModel");
-
+const PromoCode = require("../models/promocodeModel");
 const { successResponse, errorResponse } = require("../utils/Response");
 const {
   addMovieValidation,
@@ -33,24 +33,30 @@ const getMovies = async (req, res) => {
 const addMovies = async (req, res) => {
   console.log(req.body);
   try {
-    const value = await addMovieValidation.validateAsync(req.body);
-    console.log(value);
-    if (value) {
-      const dataObj = new Movie({
-        title: req.body.title,
-        description: req.body.description,
-        poster_api: req.body.poster_api,
-        movie_type: req.body.movie_type,
-        is_released: req.body.is_released,
-        language: req.body.language,
-        format: req.body.format,
-        hour: req.body.hour,
-        minute: req.body.minute,
-        date: req.body.date,
-      });
-      console.log("dataObj " + dataObj);
-      const moviesData = await dataObj.save();
-      successResponse(moviesData, res);
+    const movieData = await Movie.find({ title: req.body.title });
+
+    if (movieData.length === 0) {
+      const value = await addMovieValidation.validateAsync(req.body);
+      console.log(value);
+      if (value) {
+        const dataObj = new Movie({
+          title: req.body.title,
+          description: req.body.description,
+          poster_api: req.body.poster_api,
+          movie_type: req.body.movie_type,
+          is_released: req.body.is_released,
+          language: req.body.language,
+          format: req.body.format,
+          hour: req.body.hour,
+          minute: req.body.minute,
+          date: req.body.date,
+        });
+        console.log("dataObj " + dataObj);
+        const moviesData = await dataObj.save();
+        successResponse(moviesData, res);
+      }
+    } else {
+      errorResponse("same movie name already Exist ", res, 501);
     }
   } catch (err) {
     errorResponse(err.details[0]?.message, res, 501);
@@ -118,18 +124,23 @@ const updateMovies = async (req, res) => {
 };
 
 const deleteMovies = async (req, res) => {
-  console.log("from deleteMovies  " + req.params.title);
   try {
-    const cdeletedMovie = await Show.findOne({ title: req.params.title });
-    if (cdeletedMovie) {
+    const movieShow = await Show.findOne({ title: req.params.title });
+    if (movieShow) {
       errorResponse("show is available so can't delete the movie", res, 501);
     } else {
-      console.log("movie delete");
-      const resultedData = await Movie.deleteOne({ title: req.params.title });
-      console.log("movie deleted");
-      // const deletedMovie = await Show.deleteMany({ title: req.params.title });
-      // console.log("both deleted");
-      successResponse("deleted", res);
+      await Movie.deleteOne({ title: req.params.title });
+
+      // const moviepromo = await PromoCode.find({movies : {$in : req.params.title}})
+
+      // moviepromo.map((data) => {
+      //   const dm = data
+      //   const filteredArray = data.movies.filter(items => items !== req.params.title )
+      //   dm.movies = filteredArray
+      //   await PromoCode.findOneAndUpdate({d})
+      // })
+
+      // const movieArray =
     }
   } catch (err) {
     errorResponse("id does not exist", res, 500);

@@ -45,10 +45,15 @@ const getPromoCode = async (req, res) => {
       successResponse(promoArray, res);
     } else {
       if (req.query.id) {
-        const promoCodeData = await Promocode.find({ _id: req.query.id });
+        const promoCodeData = await Promocode.find({
+          _id: req.query.id,
+          expiry_date: { $gt: new Date() },
+        });
         successResponse(promoCodeData, res);
       } else {
-        const promoCodeData = await Promocode.find();
+        const promoCodeData = await Promocode.find({
+          expiry_date: { $gt: new Date() },
+        });
         successResponse(promoCodeData, res);
       }
     }
@@ -134,8 +139,17 @@ const editPromoCode = async (req, res) => {
   }
 };
 
+const deletePromoCode = async (req, res) => {
+  try {
+    await Promocode.deleteOne({ promo_name: req.params.promo_name });
+    await UserPromoCode.deleteMany({ promo_name: req.params.promo_name });
+  } catch (error) {
+    errorResponse(error, res, 500);
+  }
+};
 module.exports = {
   addPromoCode,
   getPromoCode,
   editPromoCode,
+  deletePromoCode,
 };
