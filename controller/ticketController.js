@@ -80,14 +80,12 @@ const addTicket = async (req, res) => {
             errorResponse("limit has reached ", res, 404);
           }
         } else {
-          console.log("second part run ");
           const data = new UserPromo({
             email: req.body.email,
             promo_name: req.body.promoname,
             promo_id: req.body.promoid,
           });
           await data.save();
-          console.log("successfully created");
         }
       }
 
