@@ -74,12 +74,8 @@ const addPromoCode = async (req, res) => {
 
     let expiryTime = new Date(req.body.expiry_date);
     expiryTime.setDate(expiryTime.getDate() + 1);
-    // expiryTime.setDate(expiryTime.getDate().setHours(0, 0, 0, 0));
-    // expiryTime.setHours(0, 0, 0, 0);
     expiryTime.setUTCHours(0, 0, 0, 0);
     console.log("+1 ", expiryTime);
-    // req.body.expiry_date.setHours(0, 0, 0, 0);
-    // console.log("after  ", req.body.expiry_date);
 
     const value = await addPromocodeValidation.validateAsync(req.body);
     console.log(value);
@@ -158,9 +154,39 @@ const deletePromoCode = async (req, res) => {
     errorResponse(error, res, 500);
   }
 };
+
+const getUserPromo = async (req, res) => {
+  console.log("get user promo");
+  try {
+    const limit = UserPromoCode.aggregate([
+      {
+        $group: {
+          _id: "$promo_name",
+          totalLimit: { $sum: "$limit" },
+        },
+      },
+      {
+        $sort: { totalLimit: -1 },
+      },
+    ]).exec((err, result) => {
+      if (err) {
+        console.error(err);
+      }
+      successResponse(result, res);
+      console.log(result);
+    });
+
+    // const maxlimit = await UserPromoCode.find();
+    // successResponse(maxlimit, res);
+  } catch (error) {
+    errorResponse(error, res, 500);
+  }
+};
+
 module.exports = {
   addPromoCode,
   getPromoCode,
   editPromoCode,
   deletePromoCode,
+  getUserPromo,
 };

@@ -42,8 +42,7 @@ const checkTicket = async (req, res) => {
 
 const addTicket = async (req, res) => {
   try {
-    console.log("promo is " + req.body.promoname);
-    if (req.body.promoname === undefined) {
+    if (req.body.promoname.length === 0) {
       const userTicket = new Ticket({
         user_name: req.body.username,
         movie_title: req.body.movieTitle,
@@ -57,6 +56,7 @@ const addTicket = async (req, res) => {
 
       successResponse(userTicketData.seat, res);
     } else {
+      console.log("else part run ");
       let promoData = await Promocode.find({
         promo_name: req.body.promoname,
         expiry_date: { $gt: new Date() },
@@ -68,30 +68,13 @@ const addTicket = async (req, res) => {
           datetime: req.body.date,
         });
 
-        // console.log(req.body.promoDiscount + " dis " + promoData[0].discount);
-        // console.log(req.body.limit + " limit " + promoData[0].limit);
-        // console.log(req.body.promoname + " limit " + promoData[0].promo_name);
-        // console.log(
-        //   new Date(req.body.expiry_date) +
-        //     " expiry date " +
-        //     new Date(promoData[0].expiry_date)
-        // );
-        // console.log(
-        //   req.body.active_status +
-        //     " active status " +
-        //     promoData[0].active_status
-        // );
-        // console.log("title from body " + req.body.title);
-        // console.log("movie array " + promoData[0].movies);
-        // console.log("include " + promoData[0].movies.includes(req.body.title));
-
         if (
-          req.body.promoDiscount == promoData[0].discount &&
-          req.body.promoname == promoData[0].promo_name &&
-          new Date(req.body.expiry_date) ==
-            new Date(promoData[0].expiry_date) &&
-          req.body.limit == promoData[0].limit &&
-          req.body.active_status == promoData[0].active_status &&
+          req.body.promoDiscount === promoData[0].discount &&
+          req.body.promoname === promoData[0].promo_name &&
+          new Date(req.body.expiry_date).valueOf() ===
+            new Date(promoData[0].expiry_date).valueOf() &&
+          req.body.limit === promoData[0].limit &&
+          req.body.active_status === promoData[0].active_status &&
           promoData[0].movies.includes(req.body.title)
         ) {
           let userPromoData = await UserPromo.find({
