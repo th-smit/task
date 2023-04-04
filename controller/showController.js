@@ -19,12 +19,9 @@ const getShow = async (req, res) => {
 
       const ed = new Date(req.query.date);
       ed.setHours(24, 0, 0);
-      //ed.setDate(st.getDate() + 1);
 
       const ct = new Date();
-      console.log("hello from the get ");
-      console.log("date formate " + req.query.date);
-      console.log(req.query.title);
+
       const sortedData = await Show.find({
         title: req.query.title,
         datetime: { $gt: st, $gte: ct, $lt: ed },
@@ -77,7 +74,6 @@ const addShow = async (req, res) => {
           { title: req.body.title },
         ],
       });
-      console.log("exist data " + existData);
 
       if (existData.length !== 0) {
         errorResponse({ err: "already show exist on selected date" }, res, 501);

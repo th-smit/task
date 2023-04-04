@@ -69,6 +69,17 @@ const addPromoCode = async (req, res) => {
       promo_name: req.body.promo_name,
     });
     console.log("promocode length ", promocodeData.length);
+    console.log("hello");
+    console.log("before  ", req.body.expiry_date);
+
+    let expiryTime = new Date(req.body.expiry_date);
+    expiryTime.setDate(expiryTime.getDate() + 1);
+    // expiryTime.setDate(expiryTime.getDate().setHours(0, 0, 0, 0));
+    // expiryTime.setHours(0, 0, 0, 0);
+    expiryTime.setUTCHours(0, 0, 0, 0);
+    console.log("+1 ", expiryTime);
+    // req.body.expiry_date.setHours(0, 0, 0, 0);
+    // console.log("after  ", req.body.expiry_date);
 
     const value = await addPromocodeValidation.validateAsync(req.body);
     console.log(value);
@@ -78,7 +89,7 @@ const addPromoCode = async (req, res) => {
         const dataObj = new Promocode({
           promo_name: req.body.promo_name,
           discount: req.body.discount,
-          expiry_date: req.body.expiry_date,
+          expiry_date: expiryTime,
           limit: req.body.limit,
           promocode_type: req.body.promocode_type,
           active_status: req.body.active_status,
@@ -93,7 +104,7 @@ const addPromoCode = async (req, res) => {
     }
   } catch (err) {
     // errorResponse(err.details[0]?.message, res, 501);
-    errorResponse("ERROR", res, 501);
+    errorResponse(err, res, 501);
   }
 };
 

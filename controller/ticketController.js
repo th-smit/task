@@ -4,10 +4,6 @@ const UserPromo = require("../models/userPromoModel");
 const Promocode = require("../models/promocodeModel");
 
 const { successResponse, errorResponse } = require("../utils/Response");
-const {
-  addShowValidation,
-  updateMovieValidation,
-} = require("../middleware/validationMiddleware");
 
 const getTicket = async (req, res) => {
   try {
@@ -46,75 +42,122 @@ const checkTicket = async (req, res) => {
 
 const addTicket = async (req, res) => {
   try {
-    let promoData = await Promocode.find({
-      promo_name: req.body.promoname,
-      expiry_date: { $gt: new Date() },
-    });
+    console.log("promo is " + req.body.promoname);
+    if (req.body.promoname === undefined) {
+      const userTicket = new Ticket({
+        user_name: req.body.username,
+        movie_title: req.body.movieTitle,
+        seat: req.body.seat,
+        show_datetime: req.body.date,
+        price: req.body.price,
+        email: req.body.email,
+        show_id: req.body.showid,
+      });
+      const userTicketData = await userTicket.save();
 
-    let userPromoData = await UserPromo.find({
-      email: req.body.email,
-      promo_name: req.body.promoname,
-    });
-
-    console.log("promo name is ", req.body.promoname);
-    console.log("length is ", promoData.length);
-
-    if (promoData.length !== 0) {
-      const movieShowData = await Show.find({
-        title: req.body.movieTitle,
-        datetime: req.body.date,
+      successResponse(userTicketData.seat, res);
+    } else {
+      let promoData = await Promocode.find({
+        promo_name: req.body.promoname,
+        expiry_date: { $gt: new Date() },
       });
 
-      if (req.body.promoname) {
-        if (userPromoData.length !== 0) {
-          if (promoData[0].limit > userPromoData[0].limit) {
-            let update = userPromoData[0];
-            update.limit += 1;
-            console.log("after update " + update.limit);
-            await UserPromo.findOneAndUpdate(
-              { email: req.body.email, promo_name: req.body.promoname },
-              { $set: update },
-              { New: true }
-            );
-          } else {
-            errorResponse("limit has reached ", res, 404);
-          }
-        } else {
-          const data = new UserPromo({
+      if (promoData.length !== 0) {
+        const movieShowData = await Show.find({
+          title: req.body.movieTitle,
+          datetime: req.body.date,
+        });
+
+        // console.log(req.body.promoDiscount + " dis " + promoData[0].discount);
+        // console.log(req.body.limit + " limit " + promoData[0].limit);
+        // console.log(req.body.promoname + " limit " + promoData[0].promo_name);
+        // console.log(
+        //   new Date(req.body.expiry_date) +
+        //     " expiry date " +
+        //     new Date(promoData[0].expiry_date)
+        // );
+        // console.log(
+        //   req.body.active_status +
+        //     " active status " +
+        //     promoData[0].active_status
+        // );
+        // console.log("title from body " + req.body.title);
+        // console.log("movie array " + promoData[0].movies);
+        // console.log("include " + promoData[0].movies.includes(req.body.title));
+
+        if (
+          req.body.promoDiscount == promoData[0].discount &&
+          req.body.promoname == promoData[0].promo_name &&
+          new Date(req.body.expiry_date) ==
+            new Date(promoData[0].expiry_date) &&
+          req.body.limit == promoData[0].limit &&
+          req.body.active_status == promoData[0].active_status &&
+          promoData[0].movies.includes(req.body.title)
+        ) {
+          let userPromoData = await UserPromo.find({
             email: req.body.email,
             promo_name: req.body.promoname,
-            promo_id: req.body.promoid,
           });
-          await data.save();
-        }
-      }
 
-      if (movieShowData) {
-        let oldData = movieShowData[0].seat;
-        let selectedSeatData = req.body.seat;
+          if (userPromoData.length !== 0) {
+            if (promoData[0].limit > userPromoData[0].limit) {
+              let update = userPromoData[0];
+              update.limit += 1;
+              console.log("after update " + update.limit);
+              await UserPromo.findOneAndUpdate(
+                { email: req.body.email, promo_name: req.body.promoname },
+                { $set: update },
+                { New: true }
+              );
+            } else {
+              errorResponse("limit has reached ", res, 404);
+            }
+          } else {
+            const data = new UserPromo({
+              email: req.body.email,
+              promo_name: req.body.promoname,
+              promo_id: req.body.promoid,
+            });
+            await data.save();
+          }
 
-        if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
-          movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
-          movieShowData[0].save();
+          if (movieShowData) {
+            let oldData = movieShowData[0].seat;
+            let selectedSeatData = req.body.seat;
 
-          const userTicket = new Ticket({
-            user_name: req.body.username,
-            movie_title: req.body.movieTitle,
-            seat: req.body.seat,
-            show_datetime: req.body.date,
-            price: req.body.price,
-            email: req.body.email,
-            show_id: req.body.showid,
-          });
-          const userTicketData = await userTicket.save();
+            if (
+              !oldData.some((oldseat) => selectedSeatData.includes(oldseat))
+            ) {
+              movieShowData[0].seat = [
+                ...movieShowData[0].seat,
+                ...req.body.seat,
+              ];
+              movieShowData[0].save();
 
-          successResponse(userTicketData.seat, res);
+              const userTicket = new Ticket({
+                user_name: req.body.username,
+                movie_title: req.body.movieTitle,
+                seat: req.body.seat,
+                show_datetime: req.body.date,
+                price: req.body.price,
+                email: req.body.email,
+                show_id: req.body.showid,
+              });
+              const userTicketData = await userTicket.save();
+
+              successResponse(userTicketData.seat, res);
+            } else {
+              errorResponse("selected seat already booked", res, 501);
+            }
+          } else {
+            errorResponse("show not available ", res, 501);
+          }
         } else {
-          errorResponse("selected seat already booked", res, 501);
+          errorResponse("something went wrong", res, 501);
         }
+      } else {
+        errorResponse("promocode is not available", res, 501);
       }
-    } else {
-      errorResponse("coupen code not available", res, 501);
     }
   } catch (error) {
     console.log(error);

@@ -129,18 +129,32 @@ const deleteMovies = async (req, res) => {
     if (movieShow) {
       errorResponse("show is available so can't delete the movie", res, 501);
     } else {
+      const moviepromo = await PromoCode.find({
+        movies: { $in: req.params.title },
+      });
+
+      moviepromo.map(async (data) => {
+        const filteredArray = data.movies.filter(
+          (items) => items !== req.params.title
+        );
+        // eslint-disable-next-line no-param-reassign
+        data.movies = filteredArray;
+        await PromoCode.findOneAndUpdate(
+          { promo_name: data.promo_name },
+          { $set: data },
+          { New: true }
+        );
+      });
+
+      // another way to delete movie from the promos
+      // await PromoCode.updateMany(
+      //   { movies: { $in: [req.params.title] } },
+      //   { $pull: { movies: req.params.title } }
+      // );
+
       await Movie.deleteOne({ title: req.params.title });
 
-      // const moviepromo = await PromoCode.find({movies : {$in : req.params.title}})
-
-      // moviepromo.map((data) => {
-      //   const dm = data
-      //   const filteredArray = data.movies.filter(items => items !== req.params.title )
-      //   dm.movies = filteredArray
-      //   await PromoCode.findOneAndUpdate({d})
-      // })
-
-      // const movieArray =
+      successResponse("updated successfully ", res);
     }
   } catch (err) {
     errorResponse("id does not exist", res, 500);
