@@ -155,6 +155,48 @@ const deletePromoCode = async (req, res) => {
   }
 };
 
+const getUserNameHighestTimeUsedPC = async (req, res) => {
+  try {
+    const limit = UserPromoCode.aggregate([
+      {
+        $group: {
+          _id: "$email",
+          totalLimit: { $sum: "$limit" },
+        },
+      },
+      {
+        $sort: {
+          totalLimit: -1,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "email",
+          as: "names",
+        },
+      },
+      {
+        $project: {
+          totalLimit: 1,
+          userName: "$names.name",
+        },
+      },
+    ]).exec((err, result) => {
+      if (err) {
+        console.error(err);
+      }
+      successResponse(result, res);
+      console.log(result);
+    });
+
+    // const maxlimit = await UserPromoCode.find();
+    // successResponse(maxlimit, res);
+  } catch (error) {
+    errorResponse(error, res, 500);
+  }
+};
 const getUserPromo = async (req, res) => {
   console.log("get user promo");
   try {
@@ -166,7 +208,9 @@ const getUserPromo = async (req, res) => {
         },
       },
       {
-        $sort: { totalLimit: -1 },
+        $sort: {
+          totalLimit: -1,
+        },
       },
     ]).exec((err, result) => {
       if (err) {
@@ -183,10 +227,37 @@ const getUserPromo = async (req, res) => {
   }
 };
 
+const getMoviePromo = async (req, res) => {
+  try {
+    UserPromoCode.aggregate(
+      [
+        {
+          $group: {
+            _id: { movieId: "$movieId", promo_name: "$promo_name" },
+            totalLimit: { $sum: "$limit" },
+          },
+        },
+      ],
+      function (err, result) {
+        if (err) {
+          errorResponse(err, res, 501);
+        } else {
+          console.log("result is is" + JSON.stringify(result));
+          successResponse(result, res);
+        }
+      }
+    );
+  } catch (error) {
+    errorResponse(error, res, 501);
+  }
+};
+
 module.exports = {
   addPromoCode,
   getPromoCode,
   editPromoCode,
   deletePromoCode,
   getUserPromo,
+  getUserNameHighestTimeUsedPC,
+  getMoviePromo,
 };

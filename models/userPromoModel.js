@@ -12,6 +12,9 @@ const UserPromoSchema = new mongoose.Schema(
     promo_name: {
       type: String,
     },
+    movieId: {
+      type: String,
+    },
     limit: {
       type: Number,
       default: 1,

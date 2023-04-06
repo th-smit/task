@@ -100,6 +100,7 @@ const addTicket = async (req, res) => {
               email: req.body.email,
               promo_name: req.body.promoname,
               promo_id: req.body.promoid,
+              movieId: req.body.movieId,
             });
             await data.save();
           }
