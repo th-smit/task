@@ -227,14 +227,77 @@ const getUserPromo = async (req, res) => {
   }
 };
 
+const getSaving = async (req, res) => {
+  try {
+    UserPromoCode.aggregate([
+      {
+        $group: {
+          _id: "$email",
+          totalSaving: { $sum: "$saving" },
+        },
+      },
+    ]).exec((err, result) => {
+      if (err) {
+        console.error(err);
+      }
+      successResponse(result, res);
+      console.log("saving data " + JSON.stringify(result));
+    });
+    console.log("hello");
+  } catch (error) {
+    errorResponse(error, res, 501);
+  }
+};
+
 const getMoviePromo = async (req, res) => {
   try {
     UserPromoCode.aggregate(
       [
         {
           $group: {
-            _id: { movieId: "$movieId", promo_name: "$promo_name" },
+            _id: { movietitle: "$movie_title", promo_name: "$promo_name" },
+
             totalLimit: { $sum: "$limit" },
+
+            promo_name: { $first: "$promo_name" },
+          },
+        },
+
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $group: {
+            _id: "$_id.movietitle",
+
+            count: { $max: "$totalLimit" },
+            maxCount: { $first: "$totalLimit" },
+            docs: { $push: "$$ROOT" },
+          },
+        },
+        {
+          $unwind: "$docs",
+        },
+        {
+          $match: {
+            $expr: {
+              $eq: ["$docs.totalLimit", "$maxCount"],
+            },
+          },
+        },
+        {
+          $sort: {
+            maxCount: -1,
+          },
+        },
+
+        {
+          $project: {
+            movie_title: "$_id",
+            promoname: "$docs.promo_name",
+            limit: "$maxCount",
           },
         },
       ],
@@ -260,4 +323,5 @@ module.exports = {
   getUserPromo,
   getUserNameHighestTimeUsedPC,
   getMoviePromo,
+  getSaving,
 };

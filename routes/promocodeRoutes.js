@@ -9,12 +9,14 @@ const {
   deletePromoCode,
   getUserPromo,
   getMoviePromo,
+  getSaving,
   getUserNameHighestTimeUsedPC,
 } = require("../controller/promocodeController");
 
 router.get("/getuserpromodata", getUserPromo);
 router.get("/getUserNameHighestTimeUsedPC", getUserNameHighestTimeUsedPC);
 router.get("/getmoviepromo", getMoviePromo);
+router.get("/getsaving", getSaving);
 router.get("/:email?/:movie_title?", getPromoCode);
 
 router.post("/", addPromoCode);

@@ -41,7 +41,9 @@ const checkTicket = async (req, res) => {
 };
 
 const addTicket = async (req, res) => {
+  console.log("req body data " + JSON.stringify(req.body));
   try {
+    console.log("promo is " + req.body.promoname);
     if (req.body.promoname.length === 0) {
       const userTicket = new Ticket({
         user_name: req.body.username,
@@ -86,6 +88,7 @@ const addTicket = async (req, res) => {
             if (promoData[0].limit > userPromoData[0].limit) {
               let update = userPromoData[0];
               update.limit += 1;
+              update.saving += req.body.saving;
               console.log("after update " + update.limit);
               await UserPromo.findOneAndUpdate(
                 { email: req.body.email, promo_name: req.body.promoname },
@@ -100,7 +103,8 @@ const addTicket = async (req, res) => {
               email: req.body.email,
               promo_name: req.body.promoname,
               promo_id: req.body.promoid,
-              movieId: req.body.movieId,
+              movie_title: req.body.title,
+              saving: req.body.saving,
             });
             await data.save();
           }

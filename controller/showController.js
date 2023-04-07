@@ -6,6 +6,7 @@ const {
   updateShowValidation,
 } = require("../middleware/validationMiddleware");
 const ticketModel = require("../models/ticketModel");
+const showModel = require("../models/showModel");
 
 const getShow = async (req, res) => {
   try {
@@ -56,6 +57,15 @@ const getShowSeat = async (req, res) => {
   }
 };
 
+const getMovieId = async (req, res) => {
+  try {
+    const movieId = Show.find({ _id: req.params.id });
+    console.log("movie id " + movieId);
+    successResponse("get the movie id", res);
+  } catch (error) {
+    errorResponse(error, res, 501);
+  }
+};
 const addShow = async (req, res) => {
   console.log("start time " + req.body.datetime);
   let showendtime = new Date(req.body.datetime);
@@ -162,6 +172,7 @@ const deleteShow = async (req, res) => {
 module.exports = {
   getShow,
   getShowSeat,
+  getMovieId,
   addShow,
   updateShow,
   deleteShow,

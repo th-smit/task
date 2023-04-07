@@ -12,12 +12,15 @@ const UserPromoSchema = new mongoose.Schema(
     promo_name: {
       type: String,
     },
-    movieId: {
+    movie_title: {
       type: String,
     },
     limit: {
       type: Number,
       default: 1,
+    },
+    saving: {
+      type: Number,
     },
   },
   { timestamps: true }

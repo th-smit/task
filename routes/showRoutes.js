@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   getShow,
   getShowSeat,
+  getMovieId,
   addShow,
   updateShow,
   deleteShow,
@@ -12,6 +13,7 @@ const {
 
 router.get("/", getShow);
 router.get("/seat/:id", getShowSeat);
+router.get("/movieid/:id", getMovieId);
 router.post("/", addShow);
 
 router.put("/:id", updateShow);
