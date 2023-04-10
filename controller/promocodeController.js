@@ -256,7 +256,7 @@ const getMoviePromo = async (req, res) => {
         {
           $group: {
             _id: { movietitle: "$movie_title", promo_name: "$promo_name" },
-
+            count: { $max: "$limit" },
             totalLimit: { $sum: "$limit" },
 
             promo_name: { $first: "$promo_name" },
