@@ -113,10 +113,6 @@ const addShow = async (req, res) => {
 };
 
 const updateShow = async (req, res) => {
-  console.log("from backend" + req.body);
-  console.log("show date " + req.body.datetime);
-  console.log(typeof req.body.datetime);
-
   try {
     const moviesData = await Show.findOne({ _id: req.params.id });
     console.log(moviesData);
