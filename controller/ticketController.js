@@ -29,7 +29,6 @@ const checkTicket = async (req, res) => {
       let selectedSeatData = req.body.seat;
 
       if (oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
-        console.log("olddata " + oldData);
         errorResponse("selected seat already booked", res, 501);
       } else {
         successResponse(selectedSeatData, res);
@@ -44,7 +43,7 @@ const addTicket = async (req, res) => {
   console.log("req body data " + JSON.stringify(req.body));
   try {
     console.log("promo is " + req.body.promoname);
-    if (req.body.promoname.length === 0) {
+    if (req.body.promoname === undefined) {
       const userTicket = new Ticket({
         user_name: req.body.username,
         movie_title: req.body.movieTitle,
@@ -55,6 +54,25 @@ const addTicket = async (req, res) => {
         show_id: req.body.showid,
       });
       const userTicketData = await userTicket.save();
+
+      const movieShowData = await Show.find({
+        title: req.body.movieTitle,
+        datetime: req.body.date,
+      });
+
+      if (movieShowData) {
+        let oldData = movieShowData[0].seat;
+        let selectedSeatData = req.body.seat;
+
+        if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
+          movieShowData[0].seat = [...movieShowData[0].seat, ...req.body.seat];
+          movieShowData[0].save();
+        } else {
+          errorResponse("selected seat already booked", res, 501);
+        }
+      } else {
+        errorResponse("show not available ", res, 501);
+      }
 
       successResponse(userTicketData.seat, res);
     } else {
@@ -77,7 +95,7 @@ const addTicket = async (req, res) => {
             new Date(promoData[0].expiry_date).valueOf() &&
           req.body.limit === promoData[0].limit &&
           req.body.active_status === promoData[0].active_status &&
-          promoData[0].movies.includes(req.body.title)
+          promoData[0].movies.includes(req.body.movieTitle)
         ) {
           let userPromoData = await UserPromo.find({
             email: req.body.email,
@@ -103,7 +121,7 @@ const addTicket = async (req, res) => {
               email: req.body.email,
               promo_name: req.body.promoname,
               promo_id: req.body.promoid,
-              movie_title: req.body.title,
+              movie_title: req.body.movieTitle,
               saving: req.body.saving,
             });
             await data.save();
