@@ -1,7 +1,10 @@
 const express = require("express");
 const cors = require("cors");
+
 const dotenv = require("dotenv");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const connectDb = require("./config/connectDb");
+// const { stripBasename } = require("@remix-run/router");
 
 //configure dotenv file
 dotenv.config();
@@ -15,6 +18,61 @@ const app = express();
 //middleware
 app.use(express.json());
 app.use(cors());
+
+app.get("/config", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+  });
+});
+
+app.use("/payment", require("./routes/PaymentRoutes"));
+
+// app.post("/create-payment-intent", async (req, res) => {
+//   // res.setHeader("Content-Type", "application/json");
+//   try {
+//     const paymentIntent = stripe.paymentIntents.create({
+//       currency: "usd",
+//       amount: 1000,
+//       automatic_payment_methods: {
+//         enabled: true,
+//       },
+//     });
+
+//     res.send({ paymentIntent: paymentIntent });
+
+// const paymentIntent = await stripe.paymentIntents.create({
+//   currency: "eur",
+//   amount: 1999,
+//   automatic_payment_methods: {
+//     enabled: true,
+//   },
+// });
+// res.send({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     console.log("backend");
+//     return res.status(400).send({
+//       error: {
+//         message: error.message,
+//       },
+//     });
+//   }
+// });
+
+// app.post("/create-payment-intent", async (req, res) => {
+//   try {
+//     res.setHeader("Content-Type", "application/json");
+//     res.send({
+//       secretkey: process.env.STRIPE_SECRET_KEY,
+//     });
+//   } catch (error) {
+//     return res.status(400).send({
+//       error: {
+//         message: error.message,
+//       },
+//     });
+//   }
+// });
 
 app.use("/pwd", require("./routes/otpRoutes"));
 app.use("/users", require("./routes/userRoutes"));
