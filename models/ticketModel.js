@@ -36,6 +36,9 @@ const TicketSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    poster_api: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
