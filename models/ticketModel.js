@@ -24,6 +24,18 @@ const TicketSchema = new mongoose.Schema(
     show_id: {
       type: String,
     },
+    discount: {
+      type: Number,
+      default: null,
+    },
+    promo_name: {
+      type: String,
+      default: null,
+    },
+    pending_status: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

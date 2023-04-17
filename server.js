@@ -28,52 +28,6 @@ app.get("/config", (req, res) => {
 
 app.use("/payment", require("./routes/PaymentRoutes"));
 
-// app.post("/create-payment-intent", async (req, res) => {
-//   // res.setHeader("Content-Type", "application/json");
-//   try {
-//     const paymentIntent = stripe.paymentIntents.create({
-//       currency: "usd",
-//       amount: 1000,
-//       automatic_payment_methods: {
-//         enabled: true,
-//       },
-//     });
-
-//     res.send({ paymentIntent: paymentIntent });
-
-// const paymentIntent = await stripe.paymentIntents.create({
-//   currency: "eur",
-//   amount: 1999,
-//   automatic_payment_methods: {
-//     enabled: true,
-//   },
-// });
-// res.send({ clientSecret: paymentIntent.client_secret });
-//   } catch (error) {
-//     console.log("backend");
-//     return res.status(400).send({
-//       error: {
-//         message: error.message,
-//       },
-//     });
-//   }
-// });
-
-// app.post("/create-payment-intent", async (req, res) => {
-//   try {
-//     res.setHeader("Content-Type", "application/json");
-//     res.send({
-//       secretkey: process.env.STRIPE_SECRET_KEY,
-//     });
-//   } catch (error) {
-//     return res.status(400).send({
-//       error: {
-//         message: error.message,
-//       },
-//     });
-//   }
-// });
-
 app.use("/pwd", require("./routes/otpRoutes"));
 app.use("/users", require("./routes/userRoutes"));
 app.use("/movie", require("./routes/movieRoutes"));

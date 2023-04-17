@@ -4,15 +4,18 @@ const router = express.Router();
 
 const {
   addTicket,
-  getTicket,
+  getTickets,
   checkTicket,
   deleteTicket,
+  changePandingStatus,
 } = require("../controller/ticketController");
 
-router.get("/", getTicket);
+router.get("/", getTickets);
 router.post("/checkticket", checkTicket);
 
 router.post("/", addTicket);
+
+router.put("/", changePandingStatus);
 
 router.delete("/", deleteTicket);
 
