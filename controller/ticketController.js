@@ -1,14 +1,41 @@
 const cron = require("node-cron");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 const Show = require("../models/showModel");
 const Ticket = require("../models/ticketModel");
 const UserPromo = require("../models/userPromoModel");
 const Promocode = require("../models/promocodeModel");
 
-const myFunction = async () => {
-  console.log("hello from the cronjob");
-};
+// const myFunction = async () => {
+//   let currentDate = new Date();
+//   console.log("cron job run");
+//   currentDate.setMinutes(currentDate.getMinutes() - 1);
+//   const ticketData = await Ticket.find({
+//     $and: [{ pending_status: true }, { createdAt: { $lt: currentDate } }],
+//   });
+//   console.log("fetched ticket data is ", ticketData);
+//   ticketData.map(async (data) => {
+//     // for await ( data of ticketData) {
+//     // const show = await Show.findById(data.show_id);
+//     // console.log("show data is " + show);
+//     // show.seat = show.seat.filter((element) => !data.seat.includes(element));
+//     // console.log("total number of seat " + show.seat);
+//     console.log("selected seat " + data.seat);
+//     // const updateddata = await show.save();
+//     // console.log("updated data ", updateddata);
+//     const updatedData = await Show.findOneAndUpdate(
+//       { _id: data.show_id },
+//       { $pull: { seat: { $in: data.seat } } },
+//       { New: true }
+//     );
+//     // console.log("updated data " + updatedData);
+//   });
+//   // const deleteTicketData = await Ticket.deleteMany({
+//   //   $and: [{ pending_status: true }, { createdAt: { $lt: currentDate } }],
+//   // });
+// };
 
-cron.schedule("*/1 * * * *", myFunction);
+// cron.schedule("*/2 * * * *", myFunction);
 
 const { successResponse, errorResponse } = require("../utils/Response");
 
@@ -97,7 +124,7 @@ const addTicket = async (req, res) => {
         let oldData = movieShowData[0].seat;
         let selectedSeatData = req.body.seat;
         console.log(
-          "seat  is available" +
+          "seat is available" +
             !oldData.some((oldseat) => selectedSeatData.includes(oldseat))
         );
         if (!oldData.some((oldseat) => selectedSeatData.includes(oldseat))) {
@@ -220,7 +247,9 @@ const changePandingStatus = async (req, res) => {
     console.log("ticket id is from backend", req.body.ticketid);
     const ticketData = await Ticket.findById(req.body.ticketid);
     console.log("fetched ticket", ticketData);
+
     ticketData.pending_status = false;
+    ticketData.payment_intentkey = req.body.paymentIntentKey;
     ticketData.save();
     successResponse(ticketData, res);
   } catch (error) {
@@ -242,12 +271,22 @@ const deleteTicket = async (req, res) => {
     );
     if (currentDate < resultedData.show_datetime) {
       console.log("valid cancel ticket");
+      console.log("intent key is ", resultedData.payment_intentkey);
+
       await Ticket.deleteOne({ _id: req.query.ticketid });
+
+      console.log("b1");
+
+      await stripe.refunds.create({
+        payment_intent: resultedData.payment_intentkey,
+      });
+      console.log("b2");
       // eslint-disable-next-line array-callback-return
       resultedData.seat.map((value1) => {
         st.seat = st.seat.filter((value2) => value1 !== value2);
       });
       await st.save();
+      console.log("b3");
       successResponse(st, res);
     } else {
       errorResponse("can't delete your ticket", res, 500);

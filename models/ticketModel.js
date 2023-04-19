@@ -39,6 +39,9 @@ const TicketSchema = new mongoose.Schema(
     poster_api: {
       type: String,
     },
+    payment_intentkey: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
