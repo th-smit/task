@@ -8,9 +8,12 @@ const {
   checkTicket,
   deleteTicket,
   changePandingStatus,
+  checkPendingStauts,
 } = require("../controller/ticketController");
 
 router.get("/", getTickets);
+
+// router.get("/checkPendingStatus", checkPendingStauts);
 router.post("/checkticket", checkTicket);
 
 router.post("/", addTicket);

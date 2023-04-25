@@ -8,7 +8,6 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const getMovies = async (req, res) => {
-  console.log("title is " + req.query.title);
   try {
     // if (!req.query.title) {
     if (req.query.title === null || req.query.title === undefined) {
@@ -31,13 +30,11 @@ const getMovies = async (req, res) => {
 };
 
 const addMovies = async (req, res) => {
-  console.log(req.body);
   try {
     const movieData = await Movie.find({ title: req.body.title });
 
     if (movieData.length === 0) {
       const value = await addMovieValidation.validateAsync(req.body);
-      console.log(value);
       if (value) {
         const dataObj = new Movie({
           title: req.body.title,
@@ -51,7 +48,6 @@ const addMovies = async (req, res) => {
           minute: req.body.minute,
           date: req.body.date,
         });
-        console.log("dataObj " + dataObj);
         const moviesData = await dataObj.save();
         successResponse(moviesData, res);
       }
@@ -64,11 +60,8 @@ const addMovies = async (req, res) => {
 };
 
 const updateMovies = async (req, res) => {
-  console.log("from backend" + req.body);
-  console.log(req.params.id);
   try {
     const moviesData = await Movie.findOne({ _id: req.params.id });
-    console.log(moviesData);
     if (!moviesData) {
       errorResponse("title does not exist", res, 404);
     } else {

@@ -34,7 +34,6 @@ const mailer = async (email, code) => {
 const emailSend = async (req, res) => {
   try {
     const userData = await User.findOne({ email: req.body.email });
-    console.log(userData);
     if (userData) {
       const otp = Math.floor(Math.random() * 1000000 + 1); //6 digit otp
 
@@ -43,7 +42,7 @@ const emailSend = async (req, res) => {
         code: otp,
         expireIn: new Date().getTime() + 300 * 1000, //5 min expire time
       };
-      const updatedData = await Otp.findOneAndUpdate(
+      await Otp.findOneAndUpdate(
         { email: req.body.email },
         { $set: otpData },
         { new: true, upsert: true }

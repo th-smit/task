@@ -1,21 +1,31 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-let paymentId = null;
+const User = require("../models/userModel");
+const Ticket = require("../models/ticketModel");
 const { successResponse, errorResponse } = require("../utils/Response");
 
 const Payment = async (req, res) => {
   try {
-    // if (paymentId === null) {
+    const { ticketid } = req.params;
+    await Ticket.findById(ticketid);
+    await User.findById({
+      email: req.body.email,
+    });
+
     const paymentIntent = await stripe.paymentIntents.create({
       currency: "inr",
       amount: 1000,
-      //   description: "Software development services",
+      description: "Ticket Booked",
       automatic_payment_methods: {
         enabled: true,
       },
     });
-    console.log("payment ", paymentIntent);
-    console.log("payment intent key is", paymentIntent.client_secret);
-    paymentId = paymentIntent.id;
+
+    await Ticket.findByIdAndUpdate(
+      ticketid,
+      { $set: { payment_intentkey: paymentIntent.id } },
+      { new: true }
+    );
+
     successResponse(
       {
         client_secret: paymentIntent.client_secret,
@@ -23,7 +33,6 @@ const Payment = async (req, res) => {
       },
       res
     );
-    // }
   } catch (error) {
     errorResponse(error, res, 500);
   }

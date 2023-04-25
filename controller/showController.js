@@ -5,14 +5,11 @@ const {
   addShowValidation,
   updateShowValidation,
 } = require("../middleware/validationMiddleware");
-const ticketModel = require("../models/ticketModel");
-const showModel = require("../models/showModel");
 
 const getShow = async (req, res) => {
   try {
     if (req.query.date) {
       const st = new Date(req.query.date);
-      console.log("selected date " + st);
       st.setHours(0);
       st.setMinutes(0);
       st.setSeconds(0);
@@ -27,7 +24,7 @@ const getShow = async (req, res) => {
         title: req.query.title,
         datetime: { $gt: st, $gte: ct, $lt: ed },
       });
-      const deletedshow = await Show.deleteMany({
+      await Show.deleteMany({
         title: req.query.title,
         datetime: { $lte: ct },
       });
@@ -48,9 +45,7 @@ const getShow = async (req, res) => {
 
 const getShowSeat = async (req, res) => {
   try {
-    console.log("particular show id " + req.params.id);
     const showData = await Show.find({ _id: req.params.id });
-    console.log(showData);
     successResponse(showData, res);
   } catch (error) {
     errorResponse(error, res, 404);
@@ -60,14 +55,12 @@ const getShowSeat = async (req, res) => {
 const getMovieId = async (req, res) => {
   try {
     const movieId = Show.find({ _id: req.params.id });
-    console.log("movie id " + movieId);
     successResponse("get the movie id", res);
   } catch (error) {
     errorResponse(error, res, 501);
   }
 };
 const addShow = async (req, res) => {
-  console.log("start time " + req.body.datetime);
   let showendtime = new Date(req.body.datetime);
   const ct = new Date();
   showendtime.setHours(showendtime.getHours() + req.body.hour);
@@ -75,7 +68,6 @@ const addShow = async (req, res) => {
   if (ct > new Date(req.body.datetime)) {
     errorResponse("invalid", res, 404);
   } else {
-    console.log("valid");
     try {
       const existData = await Show.find({
         $and: [
@@ -101,7 +93,6 @@ const addShow = async (req, res) => {
             datetime: sethm,
             endtime: showendtime,
           });
-          console.log("showObj " + dataObj);
           const showData = await dataObj.save();
           successResponse(showData, res);
         }
@@ -115,7 +106,6 @@ const addShow = async (req, res) => {
 const updateShow = async (req, res) => {
   try {
     const moviesData = await Show.findOne({ _id: req.params.id });
-    console.log(moviesData);
     if (!moviesData) {
       errorResponse("id does not exist", res, 404);
     } else {
@@ -129,7 +119,6 @@ const updateShow = async (req, res) => {
       }
 
       const value = await updateShowValidation.validateAsync(req.body);
-      console.log(value);
       if (value) {
         await Show.findOneAndUpdate(
           { _id: req.params.id },
@@ -147,15 +136,13 @@ const updateShow = async (req, res) => {
 };
 
 const deleteShow = async (req, res) => {
-  console.log(req.params.id);
   try {
     const check = await Show.findById(req.params.id);
-    console.log(check.seat.length);
     if (check.seat.length > 10) {
-      console.log("show can't be deleted");
+      errorResponse("show can't be deleted", res, 501);
     } else {
-      const resultedData = await Show.deleteOne({ _id: req.params.id });
-      const Data = await Ticket.deleteMany({
+      await Show.deleteOne({ _id: req.params.id });
+      await Ticket.deleteMany({
         show_id: req.params.id,
       });
       successResponse("deleted successfully", res);

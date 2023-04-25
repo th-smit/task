@@ -63,24 +63,17 @@ const getPromoCode = async (req, res) => {
 };
 
 const addPromoCode = async (req, res) => {
-  console.log("body data", req.body);
   try {
     const promocodeData = await Promocode.find({
       promo_name: req.body.promo_name,
     });
-    console.log("promocode length ", promocodeData.length);
-    console.log("hello");
-    console.log("before  ", req.body.expiry_date);
 
     let expiryTime = new Date(req.body.expiry_date);
     expiryTime.setDate(expiryTime.getDate() + 1);
     expiryTime.setUTCHours(0, 0, 0, 0);
-    console.log("+1 ", expiryTime);
 
     const value = await addPromocodeValidation.validateAsync(req.body);
-    console.log(value);
     if (value) {
-      console.log("fetched promocode data " + promocodeData.length);
       if (promocodeData.length === 0) {
         const dataObj = new Promocode({
           promo_name: req.body.promo_name,
@@ -91,25 +84,20 @@ const addPromoCode = async (req, res) => {
           active_status: req.body.active_status,
           movies: req.body.movies,
         });
-        console.log("dataObj " + dataObj);
-        const moviesData = await dataObj.save();
+        await dataObj.save();
         successResponse(dataObj, res);
       } else {
         errorResponse("alreday same named promocode available", res, 500);
       }
     }
   } catch (err) {
-    // errorResponse(err.details[0]?.message, res, 501);
     errorResponse(err, res, 501);
   }
 };
 
 const editPromoCode = async (req, res) => {
-  console.log("params " + req.params.id);
-  console.log("body data " + JSON.stringify(req.body));
   try {
     const promoData = await Promocode.findOne({ _id: req.params.id });
-    console.log("fetched data " + promoData);
     if (!promoData) {
       errorResponse("data does not exist", res, 404);
     } else {
@@ -185,20 +173,17 @@ const getUserNameHighestTimeUsedPC = async (req, res) => {
       },
     ]).exec((err, result) => {
       if (err) {
-        console.error(err);
+        errorResponse(err, res, 501);
+      } else {
+        successResponse(result, res);
+        console.log(result);
       }
-      successResponse(result, res);
-      console.log(result);
     });
-
-    // const maxlimit = await UserPromoCode.find();
-    // successResponse(maxlimit, res);
   } catch (error) {
     errorResponse(error, res, 500);
   }
 };
 const getUserPromo = async (req, res) => {
-  console.log("get user promo");
   try {
     const limit = UserPromoCode.aggregate([
       {
@@ -212,9 +197,10 @@ const getUserPromo = async (req, res) => {
           totalLimit: -1,
         },
       },
-    ]).exec((err, result) => {
-      if (err) {
-        console.error(err);
+    ]).exec((error, result) => {
+      if (error) {
+        console.error(error);
+        errorResponse(error, res, 501);
       }
       successResponse(result, res);
       console.log(result);
@@ -241,9 +227,7 @@ const getSaving = async (req, res) => {
         console.error(err);
       }
       successResponse(result, res);
-      console.log("saving data " + JSON.stringify(result));
     });
-    console.log("hello");
   } catch (error) {
     errorResponse(error, res, 501);
   }

@@ -1,3 +1,4 @@
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
@@ -9,8 +10,6 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const signUp = async (req, res) => {
-  console.log(req.body);
-
   const { name, email, password } = req.body;
 
   try {
@@ -22,11 +21,16 @@ const signUp = async (req, res) => {
       errorResponse("User already exist", res, 400);
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
-      console.log("hello");
+      const customer = await stripe.customers.create({
+        email: email,
+        name: name,
+        source: "tok_mastercard",
+      });
       const newUserData = new User({
         name,
         email,
         password: hashedPassword,
+        customer_id: customer.id,
       });
 
       const token = jwt.sign(
@@ -35,7 +39,6 @@ const signUp = async (req, res) => {
         },
         process.env.SECRET_KEY
       );
-      console.log("hello");
       await newUserData.save();
       successResponse({ user: newUserData, token: token }, res);
     }
