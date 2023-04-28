@@ -26,6 +26,12 @@ app.get("/config", (req, res) => {
   });
 });
 
+// app.get("/clientSecret", (req, res) => {
+//   res.setHeader("Content-Type", "application/json");
+//   res.send({
+//     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+//   });
+// });
 app.use("/payment", require("./routes/PaymentRoutes"));
 
 app.use("/pwd", require("./routes/otpRoutes"));

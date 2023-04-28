@@ -24,7 +24,6 @@ const signUp = async (req, res) => {
       const customer = await stripe.customers.create({
         email: email,
         name: name,
-        source: "tok_mastercard",
       });
       const newUserData = new User({
         name,

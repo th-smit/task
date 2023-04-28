@@ -25,14 +25,16 @@ const myFunction = async () => {
   });
 };
 
-cron.schedule("*/2 * * * *", myFunction);
+cron.schedule("*/55 * * * *", myFunction);
 
 const { successResponse, errorResponse } = require("../utils/Response");
 
 const getTickets = async (req, res) => {
   try {
+    console.log("ticket id ", req.query.ticket_id);
     if (req.query.ticket_id) {
       const ticketData = await Ticket.find({ _id: req.query.ticket_id });
+      console.log("ticket data ", ticketData);
       successResponse(ticketData, res);
     } else {
       const sortedData = await Ticket.find({ email: req.query.email }).sort({
@@ -195,22 +197,24 @@ const addTicket = async (req, res) => {
 const changePandingStatus = async (req, res) => {
   try {
     const ticketData = await Ticket.findById(req.body.ticketid);
-    ticketData.pending_status = false;
-    ticketData.save();
+    if (ticketData.pending_status) {
+      ticketData.pending_status = false;
+      ticketData.save();
+    }
     successResponse(ticketData, res);
   } catch (error) {
     errorResponse(error, res, 501);
   }
 };
 
-const checkPendingStauts = async (req, res) => {
-  const pendingStatus = await Ticket.findById(req.body.ticketid);
-  if (pendingStatus) {
-    successResponse("payment alredy done", res);
-  } else {
-    successResponse("payment not done", res);
-  }
-};
+// const checkPendingStauts = async (req, res) => {
+//   const pendingStatus = await Ticket.findById(req.body.ticketid);
+//   if (pendingStatus) {
+//     successResponse("payment alredy done", res);
+//   } else {
+//     successResponse("payment not done", res);
+//   }
+// };
 
 const deleteTicket = async (req, res) => {
   try {
@@ -227,7 +231,6 @@ const deleteTicket = async (req, res) => {
         });
       }
       const TicketData = await Ticket.deleteOne({ _id: req.query.ticketid });
-      console.log("b2");
       // eslint-disable-next-line array-callback-return
       resultedData.seat.map((value1) => {
         st.seat = st.seat.filter((value2) => value1 !== value2);
@@ -248,5 +251,5 @@ module.exports = {
   checkTicket,
   deleteTicket,
   changePandingStatus,
-  checkPendingStauts,
+  // checkPendingStauts,
 };
